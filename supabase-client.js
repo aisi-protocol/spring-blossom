@@ -1,8 +1,7 @@
 // Supabase客户端配置和初始化
 // 环境变量配置（Vercel会自动注入）
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://d5rcrqgg9lhuch72ffh0.baseapi.memfiredb.com';
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImV4cCI6MzM0NjE5MzY0MCwiaWF0IjoxNzY5MzkzNjQwLCJpc3MiOiJzdXBhYmFzZSJ9.oWKhdS2ozgTlIoMHvXerleK0TXjP7rjazDQeLC2NLUw';
-
+const SUPABASE_URL = 'https://d5rcrqgg9lhuch72ffh0.baseapi.memfiredb.com';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImV4cCI6MzM0NjE5MzY0MCwiaWF0IjoxNzY5MzkzNjQwLCJpc3MiOiJzdXBhYmFzZSJ9.oWKhdS2ozgTlIoMHvXerleK0TXjP7rjazDQeLC2NLUw';
 // 检查环境变量
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     console.error('❌ 缺少Supabase环境变量配置');
