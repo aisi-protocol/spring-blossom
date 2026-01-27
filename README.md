@@ -29,18 +29,21 @@
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
-手动部署
+
+### 手动部署
 
 将文件上传到静态主机
 确保所有文件在同一目录
 访问 index.html
-🛠️ 技术栈
+
+### 🛠️ 技术栈
 
 前端：HTML5, CSS3, JavaScript (ES6+)
 后端：MemFire Cloud (Supabase协议)
 数据库：PostgreSQL + 实时订阅
 部署：Vercel (CDN全球加速)
-📁 项目结构
+
+###📁 项目结构
 
 text
 springblossom/
@@ -53,7 +56,8 @@ springblossom/
 ├── vite.config.js     # Vite构建配置
 ├── .gitignore         # Git忽略文件
 └── README.md          # 说明文档
-🔧 开发设置
+
+### 🔧 开发设置
 
 本地运行
 
@@ -72,7 +76,7 @@ bash
 npm run build
 构建文件将输出到 dist/ 目录。
 
-🔒 隐私与安全
+### 🔒 隐私与安全
 
 数据保护
 
@@ -86,7 +90,8 @@ npm run build
 随机生成用户ID
 不记录IP地址
 会话结束即销毁
-🌐 域名配置
+
+### 🌐 域名配置
 
 建议域名结构
 
@@ -146,6 +151,7 @@ CREATE TABLE user_reports (
     comments TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
 🔄 版本历史
 
 v1.0.0 (2026-01)
@@ -155,6 +161,7 @@ v1.0.0 (2026-01)
 实时匿名聊天
 内容安全过滤
 移动端响应式设计
+
 🤝 贡献指南
 
 Fork项目
