@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>春暖花开 - 每一次倾诉，都是内心的春暖花开</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+    <meta name="description" content="匿名情绪支持平台，选择情绪，匹配陌生人，限时倾诉">
+</head>
+<body>
+    <div class="ocean-background"></div>
+    
+    <div class="container">
+        <!-- 欢迎页面 -->
+        <div class="screen welcome-screen active">
+            <div class="header">
+                <h1 class="title">春暖花开</h1>
+                <p class="tagline">每一次倾诉，都是内心的春暖花开</p>
+            </div>
+            
+            <div class="emotion-selection">
+                <p class="instruction">选择你此刻的情绪：</p>
+                <div class="emotion-grid" id="emotionGrid">
+                    <!-- 情绪气泡由JS动态生成 -->
+                </div>
+                <div class="custom-emotion" id="customEmotionSection" style="display: none;">
+                    <input type="text" id="customEmotionInput" placeholder="输入你的情绪...">
+                    <button id="submitCustomEmotion">确定</button>
+                </div>
+                <button class="btn-create" id="createCustomBtn">+ 创建我的情绪气泡</button>
+            </div>
+            
+            <div class="info-section">
+                <div class="privacy-badge">🔒 完全匿名</div>
+                <div class="privacy-badge">⏱️ 限时30分钟</div>
+                <div class="privacy-badge">🌸 用完即走</div>
+            </div>
+            
+            <div class="footer-note">
+                <p>点击情绪开始匹配，系统将为你寻找有相似感受的陌生人</p>
+                <p class="warning">⚠️ 请勿分享个人信息，所有对话均受内容过滤保护</p>
+            </div>
+        </div>
+
+        <!-- 匹配等待页面 -->
+        <div class="screen matching-screen">
+            <div class="matching-animation">
+                <div class="wave"></div>
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+            <h2>寻找相似的感受...</h2>
+            <p class="matching-status" id="matchingStatus">正在匹配中，请稍候</p>
+            <div class="matched-emotion" id="matchedEmotionDisplay"></div>
+            <button class="btn-cancel" id="cancelMatchBtn">取消匹配</button>
+        </div>
+
+        <!-- 聊天页面 -->
+        <div class="screen chat-screen">
+            <div class="chat-header">
+                <div class="chat-info">
+                    <h3>匿名倾诉中</h3>
+                    <p class="session-timer" id="sessionTimer">30:00</p>
+                    <p class="matched-info">基于 <span id="chatEmotionTag">情绪</span> 匹配</p>
+                </div>
+                <button class="btn-end" id="endSessionBtn">结束对话</button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <!-- 消息由JS动态生成 -->
+            </div>
+            
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="写下你想说的话...（内容经过安全过滤）"
+                        maxlength="500"
+                    ></textarea>
+                    <div class="input-footer">
+                        <span class="char-count" id="charCount">0/500</span>
+                        <button class="btn-send" id="sendMessageBtn">发送</button>
+                    </div>
+                </div>
+                <div class="input-tips">
+                    <span class="tip">💡 保持尊重与善意</span>
+                    <span class="tip">🔒 请勿分享个人信息</span>
+                    <span class="tip">⏱️ 剩余时间: <span id="remainingTime">30:00</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 会话结束页面 -->
+        <div class="screen end-screen">
+            <div class="end-animation">
+                <div class="flower">🌸</div>
+                <div class="flower">🌼</div>
+                <div class="flower">🌺</div>
+            </div>
+            <h2>对话已结束</h2>
+            <p class="end-message">感谢你的倾诉与倾听</p>
+            <div class="session-stats">
+                <p>对话时长: <span id="sessionDuration">0</span> 分钟</p>
+                <p>消息数量: <span id="messageCount">0</span> 条</p>
+            </div>
+            <div class="end-actions">
+                <button class="btn-new" id="newSessionBtn">开始新的倾诉</button>
+                <button class="btn-feedback" id="feedbackBtn">提供反馈</button>
+            </div>
+            <div class="final-quote">
+                <p>"每一次倾诉，都是内心的春暖花开"</p>
+                <p class="copyright">🌸 springblossom.me</p>
+            </div>
+        </div>
+
+        <!-- 反馈页面 -->
+        <div class="screen feedback-screen">
+            <h2>分享你的感受</h2>
+            <div class="feedback-options">
+                <button class="feedback-btn" data-feeling="positive">😊 对话有帮助</button>
+                <button class="feedback-btn" data-feeling="neutral">😐 感觉一般</button>
+                <button class="feedback-btn" data-feeling="negative">😔 不太舒服</button>
+            </div>
+            <textarea 
+                id="feedbackText" 
+                placeholder="可选：分享更多细节或建议..."
+                maxlength="1000"
+            ></textarea>
+            <div class="feedback-actions">
+                <button class="btn-submit" id="submitFeedbackBtn">提交反馈</button>
+                <button class="btn-skip" id="skipFeedbackBtn">跳过</button>
+            </div>
+            <p class="feedback-note">你的反馈将帮助我们改善服务，所有反馈均匿名处理</p>
+        </div>
+    </div>
+
+    <!-- 隐私声明浮层 -->
+    <div class="privacy-modal" id="privacyModal">
+        <div class="modal-content">
+            <h3>🔒 隐私与安全声明</h3>
+            <div class="modal-body">
+                <p><strong>完全匿名</strong>：我们不会收集你的姓名、邮箱、电话号码等个人信息。</p>
+                <p><strong>数据加密</strong>：所有消息传输均经过加密处理。</p>
+                <p><strong>内容过滤</strong>：系统自动过滤不当内容，保护对话安全。</p>
+                <p><strong>限时会话</strong>：30分钟后会话自动结束，所有记录将被安全清理。</p>
+                <p><strong>本地存储</strong>：会话期间的消息仅临时存储在内存中。</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-agree" id="agreePrivacyBtn">我理解并同意</button>
+                <button class="btn-decline" id="declineBtn">离开</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本引入 -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script type="module" src="supabase-client.js"></script>
+    <script type="module" src="match-engine.js"></script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
