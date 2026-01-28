@@ -1,4 +1,7 @@
-/* ===== 基础重置与变量 ===== */
+/* ===== 春暖花开 - 完整样式文件 ===== */
+/* 版本: 1.0.0 | 设计: 面朝大海，春暖花开 */
+
+/* ===== 1. 基础重置与变量 ===== */
 :root {
     /* 海天色系 */
     --color-sky-light: #e3f2fd;
@@ -31,7 +34,7 @@
     /* 阴影 */
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
     --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
-    --shadow-floating: 0 15px 35px rgba(0, 0, 0, 0.1);
+    --shadow-strong: 0 15px 35px rgba(0, 0, 0, 0.1);
     
     /* 圆角 */
     --radius-sm: 12px;
@@ -52,6 +55,11 @@
     box-sizing: border-box;
 }
 
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
 body {
     min-height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
@@ -62,7 +70,7 @@ body {
         var(--color-sea-deep) 100%
     );
     background-size: 400% 400%;
-    animation: seaBreath 30s ease-in-out infinite;
+    animation: seaBreath 25s ease-in-out infinite;
     color: var(--color-text);
     line-height: 1.6;
     overflow-x: hidden;
@@ -71,11 +79,10 @@ body {
 
 @keyframes seaBreath {
     0%, 100% { background-position: 50% 0%; }
-    33% { background-position: 80% 33%; }
-    66% { background-position: 20% 66%; }
+    50% { background-position: 50% 100%; }
 }
 
-/* ===== 花瓣飘落容器 ===== */
+/* ===== 2. 花瓣容器 ===== */
 #petal-container {
     position: fixed;
     top: 0;
@@ -87,7 +94,7 @@ body {
     overflow: hidden;
 }
 
-/* ===== 主应用结构 ===== */
+/* ===== 3. 主应用容器 ===== */
 .app-container {
     position: relative;
     z-index: 10;
@@ -99,10 +106,11 @@ body {
     flex-direction: column;
 }
 
+/* ===== 4. 场景系统 ===== */
 .scene {
     display: none;
     flex: 1;
-    animation: sceneFadeIn 0.6s ease-out;
+    animation: sceneFadeIn 0.5s ease-out;
 }
 
 .scene.active {
@@ -111,11 +119,19 @@ body {
 }
 
 @keyframes sceneFadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
 }
 
-/* ===== 场景1：情绪选择 ===== */
+/* ===== 5. 场景1：情绪选择 ===== */
+
+/* 5.1 头部 */
 .app-header {
     text-align: center;
     padding: 40px 20px 30px;
@@ -146,6 +162,7 @@ body {
     margin-top: 5px;
 }
 
+/* 5.2 说明文字 */
 .instruction {
     text-align: center;
     margin: 20px auto 40px;
@@ -159,26 +176,33 @@ body {
     line-height: 1.8;
 }
 
-/* 情绪花园 - 九大情绪之花 */
+/* 5.3 情绪花园 */
 .emotion-garden {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
     margin: 40px auto;
     max-width: 800px;
+    padding: 0 20px;
 }
 
-.emotion-row {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    flex-wrap: wrap;
+@media (max-width: 768px) {
+    .emotion-garden {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .emotion-garden {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
 }
 
 .emotion-flower {
     position: relative;
-    width: 120px;
-    height: 120px;
+    aspect-ratio: 1;
     border: none;
     background: transparent;
     cursor: pointer;
@@ -186,12 +210,16 @@ body {
     outline: none;
     padding: 0;
     border-radius: var(--radius-full);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .emotion-flower::before {
     content: '';
     position: absolute;
-    inset: -5px;
+    inset: -2px;
     background: rgba(255, 255, 255, 0.2);
     border-radius: var(--radius-full);
     opacity: 0;
@@ -212,7 +240,7 @@ body {
     z-index: 10;
 }
 
-.emotion-flower.selected .petal-layer {
+.emotion-flower.selected .flower-petals {
     animation: flowerBloom 1.5s ease-out forwards;
 }
 
@@ -231,18 +259,49 @@ body {
     }
 }
 
-.petal-layer {
+.flower-petals {
     position: absolute;
     inset: 0;
     border-radius: var(--radius-full);
-    background: conic-gradient(
-        from 0deg,
-        var(--emotion-color, var(--emotion-happy)),
-        color-mix(in srgb, var(--emotion-color, var(--emotion-happy)) 70%, white),
-        var(--emotion-color, var(--emotion-happy))
-    );
     transition: all var(--transition-normal);
     z-index: 1;
+}
+
+/* 为每个情绪设置颜色 */
+.emotion-flower[data-emotion="开心"] .flower-petals {
+    background: linear-gradient(135deg, var(--emotion-happy), #FFB347);
+}
+
+.emotion-flower[data-emotion="烦躁"] .flower-petals {
+    background: linear-gradient(135deg, var(--emotion-annoyed), #FF6B45);
+}
+
+.emotion-flower[data-emotion="低落"] .flower-petals {
+    background: linear-gradient(135deg, var(--emotion-low), #4A7CBF);
+}
+
+.emotion-flower[data-emotion="快乐"] .flower-petals {
+    background: linear-gradient(135deg, var(--emotion-joy), #FF4757);
+}
+
+.emotion-flower[data-emotion="焦虑"] .flower-petals {
+    background: linear-gradient(135deg, var(--emotion-anxious), #FF9800);
+}
+
+.emotion-flower[data-emotion="纠结"] .flower-petals {
+    background: linear-gradient(135deg, var(--emotion-tangled), #847EFF);
+}
+
+.emotion-flower[data-emotion="受伤"] .flower-petals {
+    background: linear-gradient(135deg, var(--emotion-hurt), #D65B5B);
+}
+
+.emotion-flower[data-emotion="不安"] .flower-petals {
+    background: linear-gradient(135deg, var(--emotion-unsettled), #3498db);
+}
+
+.emotion-flower[data-emotion="懵了"] .flower-petals {
+    background: linear-gradient(135deg, var(--emotion-confused), #95a5a6);
 }
 
 .emotion-text {
@@ -252,35 +311,10 @@ body {
     font-size: 1.3rem;
     font-weight: 600;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    display: block;
-    margin-top: 50px;
+    pointer-events: none;
 }
 
-.flower-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-full);
-    background: radial-gradient(circle at 30% 30%, #fff 0%, #ffeb3b 70%, #ff9800 100%);
-    z-index: 2;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* 为每个情绪设置颜色 */
-.emotion-flower[data-emotion="开心"] { --emotion-color: var(--emotion-happy); }
-.emotion-flower[data-emotion="烦躁"] { --emotion-color: var(--emotion-annoyed); }
-.emotion-flower[data-emotion="低落"] { --emotion-color: var(--emotion-low); }
-.emotion-flower[data-emotion="快乐"] { --emotion-color: var(--emotion-joy); }
-.emotion-flower[data-emotion="焦虑"] { --emotion-color: var(--emotion-anxious); }
-.emotion-flower[data-emotion="纠结"] { --emotion-color: var(--emotion-tangled); }
-.emotion-flower[data-emotion="受伤"] { --emotion-color: var(--emotion-hurt); }
-.emotion-flower[data-emotion="不安"] { --emotion-color: var(--emotion-unsettled); }
-.emotion-flower[data-emotion="懵了"] { --emotion-color: var(--emotion-confused); }
-
-/* 行动区域 */
+/* 5.4 行动区域 */
 .action-section {
     text-align: center;
     margin-top: 50px;
@@ -322,7 +356,7 @@ body {
     left: 100%;
 }
 
-.primary-btn:hover {
+.primary-btn:hover:not(:disabled) {
     transform: translateY(-5px);
     box-shadow: 0 15px 30px rgba(71, 118, 230, 0.4);
 }
@@ -367,9 +401,12 @@ body {
     background: rgba(255, 255, 255, 0.3);
     border-radius: var(--radius-sm);
     display: inline-block;
+    max-width: 500px;
+    line-height: 1.5;
 }
 
-/* ===== 场景2：匹配中 ===== */
+/* ===== 6. 场景2：匹配中 ===== */
+
 .matching-animation {
     position: relative;
     height: 300px;
@@ -379,6 +416,7 @@ body {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     border: 1px solid var(--color-border);
+    max-width: 600px;
 }
 
 .wave {
@@ -392,51 +430,18 @@ body {
     animation: waveMove 4s ease-in-out infinite;
 }
 
-.wave.delay-1 {
+.wave-2 {
     animation-delay: 1s;
     opacity: 0.6;
     height: 80px;
 }
 
-.wave.delay-2 {
-    animation-delay: 2s;
-    opacity: 0.4;
-    height: 60px;
-}
-
 @keyframes waveMove {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
+    0%, 100% { transform: translateY(0) scaleX(1); }
+    50% { transform: translateY(-20px) scaleX(1.1); }
 }
 
-.floating-flowers {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.floating-flower {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    border-radius: var(--radius-full);
-    background: var(--color);
-    opacity: 0.7;
-    filter: blur(1px);
-    animation: float 8s ease-in-out infinite;
-    animation-delay: var(--delay);
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
-    25% { transform: translateY(-40px) translateX(20px) rotate(90deg); }
-    50% { transform: translateY(-80px) translateX(-20px) rotate(180deg); }
-    75% { transform: translateY(-40px) translateX(10px) rotate(270deg); }
-}
-
-.searching-text {
+.searching-content {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -445,14 +450,31 @@ body {
     color: white;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     z-index: 10;
+    width: 100%;
+    padding: 0 20px;
 }
 
-.searching-text p {
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-full);
+    border-top-color: white;
+    animation: spin 1.5s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.searching-content p {
     font-size: 1.3rem;
     margin-bottom: 15px;
+    color: var(--color-text);
 }
 
-#selectedEmotionDisplay {
+#currentEmotion {
     color: var(--emotion-color);
     font-weight: bold;
     padding: 2px 8px;
@@ -464,13 +486,14 @@ body {
     display: flex;
     justify-content: center;
     gap: 8px;
+    margin-top: 20px;
 }
 
 .loading-dots span {
     width: 10px;
     height: 10px;
     border-radius: var(--radius-full);
-    background: white;
+    background: var(--color-primary);
     opacity: 0.6;
     animation: dotPulse 1.4s ease-in-out infinite;
 }
@@ -483,66 +506,33 @@ body {
     50% { transform: scale(1.3); opacity: 1; }
 }
 
-.match-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin: 40px auto;
-    max-width: 800px;
-}
-
-.info-card {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: var(--radius-md);
-    padding: 25px;
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    transition: transform var(--transition-normal);
-    border: 1px solid var(--color-border);
-}
-
-.info-card:hover {
-    transform: translateY(-5px);
-}
-
-.info-icon {
-    font-size: 2rem;
-    flex-shrink: 0;
-}
-
-.info-content h3 {
-    margin-bottom: 8px;
-    color: var(--color-text);
-}
-
-.info-content p {
-    color: var(--color-text-light);
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
 .secondary-btn {
     background: rgba(255, 255, 255, 0.9);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
     border-radius: var(--radius-xl);
     padding: 15px 30px;
     font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-normal);
     display: inline-flex;
     align-items: center;
     gap: 10px;
+    min-width: 200px;
+    justify-content: center;
 }
 
 .secondary-btn:hover {
-    background: white;
-    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
     transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
 }
 
-/* ===== 场景3：聊天室 ===== */
+/* ===== 7. 场景3：聊天室 ===== */
+
+/* 7.1 聊天头部 */
 .chat-header {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(15px);
@@ -557,6 +547,7 @@ body {
 
 .header-left, .header-right {
     flex: 1;
+    min-width: 80px;
 }
 
 .header-center {
@@ -568,6 +559,7 @@ body {
     font-size: 1.5rem;
     color: var(--color-text);
     margin-bottom: 5px;
+    font-weight: 600;
 }
 
 .chat-status {
@@ -581,6 +573,10 @@ body {
     border-radius: var(--radius-sm);
 }
 
+.status-icon {
+    font-size: 1rem;
+}
+
 .icon-btn {
     background: none;
     border: none;
@@ -589,6 +585,7 @@ body {
     padding: 8px;
     border-radius: var(--radius-full);
     transition: background var(--transition-fast);
+    color: var(--color-text-light);
 }
 
 .icon-btn:hover {
@@ -608,11 +605,13 @@ body {
     font-size: 1.2rem;
 }
 
-#countdown {
+#timerDisplay {
     font-size: 1.3rem;
+    font-family: monospace;
     color: var(--color-danger);
 }
 
+/* 7.2 聊天主体 */
 .chat-main {
     flex: 1;
     display: flex;
@@ -623,7 +622,7 @@ body {
 }
 
 .welcome-message {
-    padding: 30px;
+    padding: 25px 30px;
     background: linear-gradient(135deg, rgba(100, 181, 246, 0.1), rgba(142, 84, 233, 0.1));
     border-bottom: 1px solid var(--color-border);
 }
@@ -632,36 +631,46 @@ body {
     display: flex;
     align-items: center;
     gap: 20px;
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
 }
 
 .welcome-icon {
     font-size: 3rem;
     flex-shrink: 0;
+    animation: gentleFloat 3s ease-in-out infinite;
+}
+
+@keyframes gentleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 .welcome-text h3 {
     margin-bottom: 8px;
     color: var(--color-text);
+    font-size: 1.4rem;
 }
 
 .welcome-text p {
     color: var(--color-text-light);
     margin-bottom: 5px;
+    line-height: 1.5;
 }
 
 .welcome-text .hint {
     font-size: 0.9rem;
     color: var(--color-text-light);
     opacity: 0.8;
+    margin-top: 5px;
 }
 
-#matchedEmotionDisplay {
+#matchedEmotion {
     color: var(--emotion-color);
     font-weight: bold;
 }
 
+/* 7.3 消息区域 */
 .chat-messages {
     flex: 1;
     padding: 25px;
@@ -669,11 +678,12 @@ body {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    min-height: 400px;
 }
 
 .system-message {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .message-bubble {
@@ -683,11 +693,18 @@ body {
     line-height: 1.5;
     word-wrap: break-word;
     animation: bubbleAppear 0.3s ease-out;
+    position: relative;
 }
 
 @keyframes bubbleAppear {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { 
+        opacity: 0; 
+        transform: translateY(12px) scale(0.97); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
 }
 
 .message-bubble.system {
@@ -697,8 +714,27 @@ body {
     text-align: center;
     border: 1px solid rgba(100, 181, 246, 0.2);
     font-size: 0.95rem;
+    max-width: 90%;
 }
 
+.message-bubble.self {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 8px;
+    box-shadow: 3px 3px 15px rgba(71, 118, 230, 0.2);
+}
+
+.message-bubble.remote {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--color-text);
+    align-self: flex-start;
+    border: 1px solid rgba(224, 242, 254, 0.8);
+    border-bottom-left-radius: 8px;
+    box-shadow: -3px 3px 15px rgba(100, 181, 246, 0.1);
+}
+
+/* 7.4 输入区域 */
 .chat-input-area {
     padding: 25px;
     border-top: 1px solid var(--color-border);
@@ -713,20 +749,30 @@ body {
     position: relative;
 }
 
-#messageInput {
+#inputMessage {
     width: 100%;
     padding: 18px 20px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
     font-size: 1rem;
+    font-family: inherit;
     background: rgba(255, 255, 255, 0.95);
     transition: all var(--transition-fast);
+    resize: none;
+    min-height: 60px;
+    max-height: 150px;
+    line-height: 1.5;
 }
 
-#messageInput:focus {
+#inputMessage:focus {
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(71, 118, 230, 0.1);
+}
+
+#inputMessage::placeholder {
+    color: var(--color-text-light);
+    opacity: 0.7;
 }
 
 .input-info {
@@ -739,6 +785,7 @@ body {
 
 #charCount {
     color: var(--color-text);
+    font-weight: 500;
 }
 
 .send-btn {
@@ -756,6 +803,7 @@ body {
     gap: 10px;
     min-width: 120px;
     justify-content: center;
+    height: 60px;
 }
 
 .send-btn:hover:not(:disabled) {
@@ -766,72 +814,44 @@ body {
 .send-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
-/* ===== 海鸥动画 ===== */
-.seagulls {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 2;
+.send-icon {
+    font-size: 1.2rem;
 }
 
-.seagull {
-    position: absolute;
-    font-size: 2rem;
-    animation: seagullFly var(--duration) linear infinite;
-    animation-delay: var(--delay);
-    top: var(--start);
-    left: var(--start);
-}
-
-@keyframes seagullFly {
-    0% {
-        transform: translate(0, 0) rotate(0deg);
-        opacity: 0;
-    }
-    10% {
-        opacity: 1;
-    }
-    90% {
-        opacity: 1;
-    }
-    100% {
-        transform: translate(100vw, 100vh) rotate(360deg);
-        opacity: 0;
-    }
-}
-
-/* ===== 响应式设计 ===== */
+/* ===== 8. 响应式设计 ===== */
 @media (max-width: 768px) {
+    .app-container {
+        padding: 15px;
+    }
+    
     .app-header h1 {
         font-size: 2.8rem;
     }
     
-    .emotion-flower {
-        width: 100px;
-        height: 100px;
+    .emotion-garden {
+        gap: 20px;
     }
     
     .emotion-text {
         font-size: 1.1rem;
-        margin-top: 40px;
     }
     
     .primary-btn {
         min-width: 100%;
         padding: 16px 30px;
+        font-size: 1.1rem;
     }
     
     .features {
-        gap: 20px;
+        gap: 25px;
     }
     
     .feature {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
     }
     
     .chat-header {
@@ -845,9 +865,20 @@ body {
         text-align: center;
     }
     
+    .header-left {
+        order: 3;
+        margin-top: 10px;
+    }
+    
     .timer {
         justify-content: center;
         margin-top: 10px;
+    }
+    
+    .welcome-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
     }
     
     .message-bubble {
@@ -861,30 +892,138 @@ body {
     
     .send-btn {
         width: 100%;
+        height: 50px;
     }
 }
 
 @media (max-width: 480px) {
-    .app-container {
-        padding: 10px;
+    .app-header h1 {
+        font-size: 2.2rem;
     }
     
-    .emotion-row {
-        gap: 20px;
+    .tagline {
+        font-size: 1rem;
+    }
+    
+    .emotion-garden {
+        grid-template-columns: 1fr;
+        max-width: 300px;
     }
     
     .emotion-flower {
-        width: 85px;
-        height: 85px;
-    }
-    
-    .emotion-text {
-        font-size: 1rem;
-        margin-top: 35px;
+        max-width: 120px;
+        margin: 0 auto;
     }
     
     .primary-btn {
-        font-size: 1.1rem;
+        font-size: 1rem;
         padding: 14px 25px;
     }
+    
+    .features {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .chat-messages {
+        padding: 15px;
+        min-height: 300px;
+    }
+    
+    .message-bubble {
+        padding: 12px 16px;
+        font-size: 0.95rem;
+    }
+    
+    #inputMessage {
+        padding: 14px 16px;
+        min-height: 50px;
+    }
 }
+
+/* ===== 9. 辅助类 ===== */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-20 { margin-top: 20px; }
+.mb-20 { margin-bottom: 20px; }
+.mt-40 { margin-top: 40px; }
+.mb-40 { margin-bottom: 40px; }
+
+/* ===== 10. 花瓣动画样式 ===== */
+.petal {
+    position: absolute;
+    top: -30px;
+    width: 22px;
+    height: 22px;
+    opacity: 0.8;
+    filter: blur(0.8px);
+    border-radius: 50% 0 50% 50%;
+    animation: petalFall linear forwards;
+    pointer-events: none;
+}
+
+@keyframes petalFall {
+    to {
+        transform: 
+            translateY(calc(100vh + 30px)) 
+            translateX(var(--drift, 0))
+            rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* ===== 11. 滚动条样式 ===== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(100, 181, 246, 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 181, 246, 0.7);
+}
+
+/* ===== 12. 聚焦样式 ===== */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+/* ===== 13. 打印样式 ===== */
+@media print {
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .app-container {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+    
+    .chat-input-area,
+    .primary-btn,
+    .secondary-btn,
+    .send-btn {
+        display: none !important;
+    }
+}
+
+/* ===== 结束 ===== */
