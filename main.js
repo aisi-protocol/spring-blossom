@@ -1,4 +1,132 @@
-// 春暖花开 - 主应用程序逻辑
+/**
+ * 创建花瓣飘落效果 - 春暖花开视觉反馈
+ * @param {number} count - 花瓣数量，默认30
+ * @param {string} emotion - 情绪标签，用于影响花瓣色调
+ */
+function createPetals(count = 30, emotion = null) {
+    // 确保容器存在
+    let container = document.getElementById('petal-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'petal-container';
+        document.body.appendChild(container);
+    }
+    
+    // 清理过多花瓣（性能优化）
+    if (container.children.length > 100) {
+        const excess = container.children.length - 70;
+        for (let i = 0; i < excess; i++) {
+            if (container.firstChild) container.removeChild(container.firstChild);
+        }
+    }
+    
+    // 情绪对应的主色调映射（用于花瓣颜色）
+    const emotionHues = {
+        '开心': { min: 45, max: 65 },    // 黄色系
+        '烦躁': { min: 15, max: 25 },    // 橙色系
+        '低落': { min: 200, max: 220 },  // 蓝色系
+        '快乐': { min: 330, max: 350 },  // 粉色系
+        '焦虑': { min: 30, max: 45 },    // 琥珀色系
+        '纠结': { min: 250, max: 270 },  // 紫色系
+        '受伤': { min: 350, max: 10 },   // 红色/粉色系
+        '不安': { min: 190, max: 210 },  // 冷蓝色系
+        '懵了': { min: 0, max: 0 }       // 灰色，特殊处理
+    };
+    
+    // 创建花瓣
+    for (let i = 0; i < count; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'petal';
+        
+        // 随机水平位置
+        petal.style.left = Math.random() * 100 + 'vw';
+        
+        // 花瓣颜色逻辑
+        let hue, saturation, lightness;
+        if (emotion && emotionHues[emotion]) {
+            const hueRange = emotionHues[emotion];
+            if (emotion === '懵了') {
+                // 灰色花瓣
+                hue = 0;
+                saturation = 0;
+                lightness = Math.random() * 30 + 60;
+            } else {
+                hue = hueRange.min + Math.random() * (hueRange.max - hueRange.min);
+                saturation = Math.random() * 30 + 60;
+                lightness = Math.random() * 20 + 60;
+            }
+        } else {
+            // 默认随机春色
+            hue = Math.random() * 60 + 300; // 偏粉紫色调
+            saturation = Math.random() * 30 + 60;
+            lightness = Math.random() * 20 + 65;
+        }
+        
+        petal.style.background = `linear-gradient(135deg, 
+            hsl(${hue}, ${saturation}%, ${lightness}%), 
+            hsl(${hue}, ${saturation}%, ${lightness - 15}%)
+        )`;
+        
+        // 随机大小和旋转
+        const size = 15 + Math.random() * 15;
+        petal.style.width = size + 'px';
+        petal.style.height = size + 'px';
+        const rotate = Math.random() * 360;
+        petal.style.borderRadius = `50% 0 50% ${Math.random() * 30 + 40}%`;
+        
+        // 随机动画参数
+        const duration = 8 + Math.random() * 12;
+        const delay = Math.random() * 5;
+        const drift = (Math.random() - 0.5) * 100; // 水平漂移
+        
+        petal.style.animation = `petalFall ${duration}s linear ${delay}s forwards`;
+        petal.style.setProperty('--drift', `${drift}px`);
+        
+        // 添加自定义属性跟踪
+        petal.setAttribute('data-created', Date.now());
+        
+        container.appendChild(petal);
+        
+        // 动画结束后移除元素（考虑动画时间+延迟）
+        setTimeout(() => {
+            if (petal.parentNode === container) {
+                container.removeChild(petal);
+            }
+        }, (duration + delay) * 1000);
+    }
+}
+
+// 扩展CSS支持水平漂移（需动态添加）
+if (!document.querySelector('#petal-animation-style')) {
+    const style = document.createElement('style');
+    style.id = 'petal-animation-style';
+    style.textContent = `
+        @keyframes petalFall {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(calc(100vh + 30px)) translateX(var(--drift, 0)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+/**
+ * 触发花瓣效果的关键事件绑定示例
+ * 在实际集成时，请在以下时机调用 createPetals():
+ * 1. 用户选择情绪标签时（可选，少量花瓣）
+ * 2. 匹配成功时（建议，中等数量）
+ * 3. 收到第一条消息或连接建立时（建议，少量花瓣）
+ * 
+ * 示例：document.querySelector('.emotion-tag').addEventListener('click', function() {
+ *   const emotion = this.dataset.emotion;
+ *   createPetals(15, emotion);
+ * });
+ */// 春暖花开 - 主应用程序逻辑
 import { initializeSupabase } from './supabase-client.js';
 import { startMatching, cancelMatching, sendMessage, endSession } from './match-engine.js';
 
