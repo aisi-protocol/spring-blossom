@@ -1,33 +1,17 @@
-// Vite配置文件
-import { defineConfig } from 'vite';
-
-export default defineConfig({
-  base: '/',
-  server: {
-    port: 3000,
-    host: true,
-    open: true
-  },
+// vite.config.js
+export default {
+  root: '.',
   build: {
     outDir: 'dist',
-    sourcemap: false,
+    emptyOutDir: true,
     rollupOptions: {
+      external: ['https://unpkg.com/@supabase/supabase-js@2'], // 明确排除
       output: {
-        manualChunks: {
-          vendor: ['https://unpkg.com/@supabase/supabase-js@2']
-        }
-      }
-    }
-  },
-  css: {
-    preprocessorOptions: {
-      css: {
-        charset: false
+        manualChunks: undefined // 禁用 manualChunks
       }
     }
   },
   optimizeDeps: {
-    include: []
-  },
-  publicDir: false
-});
+    exclude: ['@supabase/supabase-js'] // 排除优化
+  }
+}
