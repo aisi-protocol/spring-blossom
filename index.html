@@ -1,890 +1,259 @@
-/* ===== 基础重置与变量 ===== */
-:root {
-    /* 海天色系 */
-    --color-sky-light: #e3f2fd;
-    --color-sky-mid: #bbdefb;
-    --color-sea-light: #90caf9;
-    --color-sea-deep: #64b5f6;
-    --color-sea-darker: #42a5f5;
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>春暖花开 - 每一次倾诉，都是内心的春暖花开</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+</head>
+<body>
+    <!-- 花瓣飘落容器 -->
+    <div id="petal-container" aria-hidden="true"></div>
     
-    /* 情绪花色 */
-    --emotion-happy: #FFD93D;
-    --emotion-annoyed: #FF8E6B;
-    --emotion-low: #6C9BCF;
-    --emotion-joy: #FF6B8B;
-    --emotion-anxious: #FFA726;
-    --emotion-tangled: #A29BFE;
-    --emotion-hurt: #E66767;
-    --emotion-unsettled: #74B9FF;
-    --emotion-confused: #B2BEC3;
+    <!-- 主应用容器 -->
+    <div class="app-container">
+        <!-- 场景1：情绪选择 -->
+        <div id="emotionScene" class="scene active">
+            <header class="app-header">
+                <h1>🌊 春暖花开</h1>
+                <p class="tagline">每一次倾诉，都是内心的春暖花开</p>
+            </header>
+            
+            <main class="main-content">
+                <div class="instruction">
+                    <p>面朝大海，感受此刻。请选择最能代表你此刻的情绪：</p>
+                </div>
+                
+                <!-- 九大情绪之花 -->
+                <div class="emotion-garden">
+                    <div class="emotion-row">
+                        <button class="emotion-flower" data-emotion="开心" data-color="#FFD93D">
+                            <div class="petal-layer"></div>
+                            <span class="emotion-text">开心</span>
+                            <div class="flower-center"></div>
+                        </button>
+                        
+                        <button class="emotion-flower" data-emotion="烦躁" data-color="#FF8E6B">
+                            <div class="petal-layer"></div>
+                            <span class="emotion-text">烦躁</span>
+                            <div class="flower-center"></div>
+                        </button>
+                        
+                        <button class="emotion-flower" data-emotion="低落" data-color="#6C9BCF">
+                            <div class="petal-layer"></div>
+                            <span class="emotion-text">低落</span>
+                            <div class="flower-center"></div>
+                        </button>
+                    </div>
+                    
+                    <div class="emotion-row">
+                        <button class="emotion-flower" data-emotion="快乐" data-color="#FF6B8B">
+                            <div class="petal-layer"></div>
+                            <span class="emotion-text">快乐</span>
+                            <div class="flower-center"></div>
+                        </button>
+                        
+                        <button class="emotion-flower" data-emotion="焦虑" data-color="#FFA726">
+                            <div class="petal-layer"></div>
+                            <span class="emotion-text">焦虑</span>
+                            <div class="flower-center"></div>
+                        </button>
+                        
+                        <button class="emotion-flower" data-emotion="纠结" data-color="#A29BFE">
+                            <div class="petal-layer"></div>
+                            <span class="emotion-text">纠结</span>
+                            <div class="flower-center"></div>
+                        </button>
+                    </div>
+                    
+                    <div class="emotion-row">
+                        <button class="emotion-flower" data-emotion="受伤" data-color="#E66767">
+                            <div class="petal-layer"></div>
+                            <span class="emotion-text">受伤</span>
+                            <div class="flower-center"></div>
+                        </button>
+                        
+                        <button class="emotion-flower" data-emotion="不安" data-color="#74B9FF">
+                            <div class="petal-layer"></div>
+                            <span class="emotion-text">不安</span>
+                            <div class="flower-center"></div>
+                        </button>
+                        
+                        <button class="emotion-flower" data-emotion="懵了" data-color="#B2BEC3">
+                            <div class="petal-layer"></div>
+                            <span class="emotion-text">懵了</span>
+                            <div class="flower-center"></div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="action-section">
+                    <button id="startMatchBtn" class="primary-btn" disabled>
+                        <span class="btn-icon">🌊</span>
+                        <span class="btn-text">面朝大海，开始匹配</span>
+                    </button>
+                    
+                    <div class="features">
+                        <div class="feature">
+                            <span class="feature-icon">🌸</span>
+                            <span>完全匿名</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">⏱️</span>
+                            <span>限时30分钟</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">🔒</span>
+                            <span>用完即走</span>
+                        </div>
+                    </div>
+                    
+                    <p class="safety-note">
+                        🌈 请勿分享个人信息，所有对话均受内容过滤保护
+                    </p>
+                </div>
+            </main>
+        </div>
+        
+        <!-- 场景2：匹配中 -->
+        <div id="matchingScene" class="scene">
+            <header class="app-header">
+                <h1>🌊 春暖花开</h1>
+                <p class="tagline">正在海面上寻找相似的感受...</p>
+            </header>
+            
+            <main class="main-content">
+                <div class="matching-animation">
+                    <div class="wave"></div>
+                    <div class="wave delay-1"></div>
+                    <div class="wave delay-2"></div>
+                    
+                    <div class="floating-flowers">
+                        <div class="floating-flower" style="--delay: 0s; --color: #FFD93D"></div>
+                        <div class="floating-flower" style="--delay: 1s; --color: #6C9BCF"></div>
+                        <div class="floating-flower" style="--delay: 2s; --color: #FF6B8B"></div>
+                    </div>
+                    
+                    <div class="searching-text">
+                        <p>正在为你寻找此刻能理解你<span id="selectedEmotionDisplay">开心</span>的人</p>
+                        <div class="loading-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="match-info">
+                    <div class="info-card">
+                        <span class="info-icon">👥</span>
+                        <div class="info-content">
+                            <h3>基于情绪匹配</h3>
+                            <p>系统正根据你选择的情绪标签，寻找此刻有相似感受的陌生人</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <span class="info-icon">⚡</span>
+                        <div class="info-content">
+                            <h3>实时匿名连接</h3>
+                            <p>匹配成功后，将建立安全的临时连接，开启30分钟限时对话</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-section">
+                    <button id="cancelMatchBtn" class="secondary-btn">
+                        <span class="btn-icon">↩️</span>
+                        <span class="btn-text">取消匹配，重新选择</span>
+                    </button>
+                </div>
+            </main>
+        </div>
+        
+        <!-- 场景3：聊天室 -->
+        <div id="chatScene" class="scene">
+            <header class="chat-header">
+                <div class="header-left">
+                    <button id="endChatBtn" class="icon-btn" title="结束对话">
+                        ⏹️
+                    </button>
+                </div>
+                
+                <div class="header-center">
+                    <h2>春暖花开 · 匿名倾诉</h2>
+                    <div class="chat-status">
+                        <span class="status-icon">🌸</span>
+                        <span class="status-text">基于情绪匹配</span>
+                    </div>
+                </div>
+                
+                <div class="header-right">
+                    <div class="timer">
+                        <span class="timer-icon">⏱️</span>
+                        <span id="countdown">30:00</span>
+                    </div>
+                </div>
+            </header>
+            
+            <main class="chat-main">
+                <!-- 匹配成功欢迎 -->
+                <div class="welcome-message">
+                    <div class="welcome-content">
+                        <div class="welcome-icon">🌊</div>
+                        <div class="welcome-text">
+                            <h3>海浪带来了相似的感受</h3>
+                            <p>你们彼此选择了 <span id="matchedEmotionDisplay">开心</span> 的情绪</p>
+                            <p class="hint">这是一次完全匿名的限时对话，请保持尊重与善意</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 聊天消息区域 -->
+                <div id="chatMessages" class="chat-messages">
+                    <!-- 消息会动态插入到这里 -->
+                    <div class="system-message">
+                        <div class="message-bubble system">
+                            <p>对话已开始，请勿分享个人信息。30分钟后连接将自动断开。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 聊天输入区域 -->
+                <div class="chat-input-area">
+                    <div class="input-container">
+                        <input 
+                            type="text" 
+                            id="messageInput" 
+                            placeholder="写下你想说的话（内容经过安全过滤）..." 
+                            maxlength="500"
+                        >
+                        <div class="input-info">
+                            <span id="charCount">0/500</span>
+                            <span class="hint">按下 Enter 发送</span>
+                        </div>
+                    </div>
+                    
+                    <button id="sendMessageBtn" class="send-btn">
+                        <span class="send-icon">🌸</span>
+                        <span class="send-text">发送</span>
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
     
-    /* 功能色 */
-    --color-primary: #4776E6;
-    --color-secondary: #8E54E9;
-    --color-success: #4CAF50;
-    --color-warning: #FF9800;
-    --color-danger: #f44336;
-    --color-text: #2c3e50;
-    --color-text-light: #666;
-    --color-border: rgba(255, 255, 255, 0.3);
+    <!-- 海鸥动画背景元素 -->
+    <div class="seagulls">
+        <div class="seagull" style="--delay: 0s; --duration: 25s; --start: -10%"></div>
+        <div class="seagull" style="--delay: 7s; --duration: 30s; --start: -15%"></div>
+        <div class="seagull" style="--delay: 15s; --duration: 20s; --start: -5%"></div>
+    </div>
     
-    /* 阴影 */
-    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
-    --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
-    --shadow-floating: 0 15px 35px rgba(0, 0, 0, 0.1);
-    
-    /* 圆角 */
-    --radius-sm: 12px;
-    --radius-md: 20px;
-    --radius-lg: 32px;
-    --radius-xl: 50px;
-    --radius-full: 50%;
-    
-    /* 动画 */
-    --transition-fast: 0.2s ease;
-    --transition-normal: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    --transition-slow: 0.8s ease;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    min-height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
-    background: linear-gradient(180deg, 
-        var(--color-sky-light) 0%,
-        var(--color-sky-mid) 25%,
-        var(--color-sea-light) 60%,
-        var(--color-sea-deep) 100%
-    );
-    background-size: 400% 400%;
-    animation: seaBreath 30s ease-in-out infinite;
-    color: var(--color-text);
-    line-height: 1.6;
-    overflow-x: hidden;
-    position: relative;
-}
-
-@keyframes seaBreath {
-    0%, 100% { background-position: 50% 0%; }
-    33% { background-position: 80% 33%; }
-    66% { background-position: 20% 66%; }
-}
-
-/* ===== 花瓣飘落容器 ===== */
-#petal-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-    overflow: hidden;
-}
-
-/* ===== 主应用结构 ===== */
-.app-container {
-    position: relative;
-    z-index: 10;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.scene {
-    display: none;
-    flex: 1;
-    animation: sceneFadeIn 0.6s ease-out;
-}
-
-.scene.active {
-    display: flex;
-    flex-direction: column;
-}
-
-@keyframes sceneFadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* ===== 场景1：情绪选择 ===== */
-.app-header {
-    text-align: center;
-    padding: 40px 20px 30px;
-    animation: headerFloat 6s ease-in-out infinite;
-}
-
-@keyframes headerFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-.app-header h1 {
-    font-size: 3.5rem;
-    font-weight: 300;
-    margin-bottom: 10px;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 2px 10px rgba(71, 118, 230, 0.2);
-}
-
-.tagline {
-    font-size: 1.2rem;
-    color: var(--color-text-light);
-    font-weight: 300;
-    letter-spacing: 2px;
-    margin-top: 5px;
-}
-
-.instruction {
-    text-align: center;
-    margin: 20px auto 40px;
-    max-width: 600px;
-    padding: 0 20px;
-}
-
-.instruction p {
-    font-size: 1.1rem;
-    color: var(--color-text);
-    line-height: 1.8;
-}
-
-/* 情绪花园 - 九大情绪之花 */
-.emotion-garden {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    margin: 40px auto;
-    max-width: 800px;
-}
-
-.emotion-row {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    flex-wrap: wrap;
-}
-
-.emotion-flower {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    transition: all var(--transition-normal);
-    outline: none;
-    padding: 0;
-    border-radius: var(--radius-full);
-}
-
-.emotion-flower::before {
-    content: '';
-    position: absolute;
-    inset: -5px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-full);
-    opacity: 0;
-    transition: opacity var(--transition-normal);
-    z-index: 0;
-}
-
-.emotion-flower:hover::before {
-    opacity: 1;
-}
-
-.emotion-flower:hover {
-    transform: translateY(-10px) scale(1.1);
-}
-
-.emotion-flower.selected {
-    transform: translateY(-15px) scale(1.15);
-    z-index: 10;
-}
-
-.emotion-flower.selected .petal-layer {
-    animation: flowerBloom 1.5s ease-out forwards;
-}
-
-@keyframes flowerBloom {
-    0% { 
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-    }
-    50% { 
-        transform: scale(1.3);
-        box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.3);
-    }
-    100% { 
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-    }
-}
-
-.petal-layer {
-    position: absolute;
-    inset: 0;
-    border-radius: var(--radius-full);
-    background: conic-gradient(
-        from 0deg,
-        var(--emotion-color, var(--emotion-happy)),
-        color-mix(in srgb, var(--emotion-color, var(--emotion-happy)) 70%, white),
-        var(--emotion-color, var(--emotion-happy))
-    );
-    transition: all var(--transition-normal);
-    z-index: 1;
-}
-
-.emotion-text {
-    position: relative;
-    z-index: 3;
-    color: white;
-    font-size: 1.3rem;
-    font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    display: block;
-    margin-top: 50px;
-}
-
-.flower-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-full);
-    background: radial-gradient(circle at 30% 30%, #fff 0%, #ffeb3b 70%, #ff9800 100%);
-    z-index: 2;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* 为每个情绪设置颜色 */
-.emotion-flower[data-emotion="开心"] { --emotion-color: var(--emotion-happy); }
-.emotion-flower[data-emotion="烦躁"] { --emotion-color: var(--emotion-annoyed); }
-.emotion-flower[data-emotion="低落"] { --emotion-color: var(--emotion-low); }
-.emotion-flower[data-emotion="快乐"] { --emotion-color: var(--emotion-joy); }
-.emotion-flower[data-emotion="焦虑"] { --emotion-color: var(--emotion-anxious); }
-.emotion-flower[data-emotion="纠结"] { --emotion-color: var(--emotion-tangled); }
-.emotion-flower[data-emotion="受伤"] { --emotion-color: var(--emotion-hurt); }
-.emotion-flower[data-emotion="不安"] { --emotion-color: var(--emotion-unsettled); }
-.emotion-flower[data-emotion="懵了"] { --emotion-color: var(--emotion-confused); }
-
-/* 行动区域 */
-.action-section {
-    text-align: center;
-    margin-top: 50px;
-    padding: 0 20px;
-}
-
-.primary-btn {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-    color: white;
-    border: none;
-    border-radius: var(--radius-xl);
-    padding: 18px 40px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition-normal);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    min-width: 280px;
-    box-shadow: var(--shadow-medium);
-    position: relative;
-    overflow: hidden;
-}
-
-.primary-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.6s ease;
-}
-
-.primary-btn:hover::before {
-    left: 100%;
-}
-
-.primary-btn:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(71, 118, 230, 0.4);
-}
-
-.primary-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none !important;
-    box-shadow: var(--shadow-soft) !important;
-}
-
-.btn-icon {
-    font-size: 1.4rem;
-}
-
-.features {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin: 30px auto;
-    flex-wrap: wrap;
-    max-width: 600px;
-}
-
-.feature {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--color-text-light);
-    font-size: 0.95rem;
-}
-
-.feature-icon {
-    font-size: 1.2rem;
-}
-
-.safety-note {
-    margin-top: 20px;
-    color: var(--color-text-light);
-    font-size: 0.9rem;
-    padding: 12px 20px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: var(--radius-sm);
-    display: inline-block;
-}
-
-/* ===== 场景2：匹配中 ===== */
-.matching-animation {
-    position: relative;
-    height: 300px;
-    margin: 40px auto;
-    overflow: hidden;
-    border-radius: var(--radius-lg);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--color-border);
-}
-
-.wave {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100px;
-    background: linear-gradient(transparent, rgba(255, 255, 255, 0.3));
-    border-radius: 50%;
-    animation: waveMove 4s ease-in-out infinite;
-}
-
-.wave.delay-1 {
-    animation-delay: 1s;
-    opacity: 0.6;
-    height: 80px;
-}
-
-.wave.delay-2 {
-    animation-delay: 2s;
-    opacity: 0.4;
-    height: 60px;
-}
-
-@keyframes waveMove {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-}
-
-.floating-flowers {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.floating-flower {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    border-radius: var(--radius-full);
-    background: var(--color);
-    opacity: 0.7;
-    filter: blur(1px);
-    animation: float 8s ease-in-out infinite;
-    animation-delay: var(--delay);
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
-    25% { transform: translateY(-40px) translateX(20px) rotate(90deg); }
-    50% { transform: translateY(-80px) translateX(-20px) rotate(180deg); }
-    75% { transform: translateY(-40px) translateX(10px) rotate(270deg); }
-}
-
-.searching-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    z-index: 10;
-}
-
-.searching-text p {
-    font-size: 1.3rem;
-    margin-bottom: 15px;
-}
-
-#selectedEmotionDisplay {
-    color: var(--emotion-color);
-    font-weight: bold;
-    padding: 2px 8px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-sm);
-}
-
-.loading-dots {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-}
-
-.loading-dots span {
-    width: 10px;
-    height: 10px;
-    border-radius: var(--radius-full);
-    background: white;
-    opacity: 0.6;
-    animation: dotPulse 1.4s ease-in-out infinite;
-}
-
-.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes dotPulse {
-    0%, 100% { transform: scale(1); opacity: 0.6; }
-    50% { transform: scale(1.3); opacity: 1; }
-}
-
-.match-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin: 40px auto;
-    max-width: 800px;
-}
-
-.info-card {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: var(--radius-md);
-    padding: 25px;
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    transition: transform var(--transition-normal);
-    border: 1px solid var(--color-border);
-}
-
-.info-card:hover {
-    transform: translateY(-5px);
-}
-
-.info-icon {
-    font-size: 2rem;
-    flex-shrink: 0;
-}
-
-.info-content h3 {
-    margin-bottom: 8px;
-    color: var(--color-text);
-}
-
-.info-content p {
-    color: var(--color-text-light);
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-.secondary-btn {
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    padding: 15px 30px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all var(--transition-normal);
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.secondary-btn:hover {
-    background: white;
-    border-color: var(--color-primary);
-    transform: translateY(-3px);
-}
-
-/* ===== 场景3：聊天室 ===== */
-.chat-header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(15px);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    padding: 20px 30px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--color-border);
-    box-shadow: var(--shadow-soft);
-}
-
-.header-left, .header-right {
-    flex: 1;
-}
-
-.header-center {
-    text-align: center;
-    flex: 2;
-}
-
-.header-center h2 {
-    font-size: 1.5rem;
-    color: var(--color-text);
-    margin-bottom: 5px;
-}
-
-.chat-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--color-text-light);
-    font-size: 0.9rem;
-    padding: 4px 12px;
-    background: rgba(100, 181, 246, 0.1);
-    border-radius: var(--radius-sm);
-}
-
-.icon-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: var(--radius-full);
-    transition: background var(--transition-fast);
-}
-
-.icon-btn:hover {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-.timer {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: flex-end;
-    color: var(--color-text);
-    font-weight: 600;
-}
-
-.timer-icon {
-    font-size: 1.2rem;
-}
-
-#countdown {
-    font-size: 1.3rem;
-    color: var(--color-danger);
-}
-
-.chat-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-    overflow: hidden;
-}
-
-.welcome-message {
-    padding: 30px;
-    background: linear-gradient(135deg, rgba(100, 181, 246, 0.1), rgba(142, 84, 233, 0.1));
-    border-bottom: 1px solid var(--color-border);
-}
-
-.welcome-content {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.welcome-icon {
-    font-size: 3rem;
-    flex-shrink: 0;
-}
-
-.welcome-text h3 {
-    margin-bottom: 8px;
-    color: var(--color-text);
-}
-
-.welcome-text p {
-    color: var(--color-text-light);
-    margin-bottom: 5px;
-}
-
-.welcome-text .hint {
-    font-size: 0.9rem;
-    color: var(--color-text-light);
-    opacity: 0.8;
-}
-
-#matchedEmotionDisplay {
-    color: var(--emotion-color);
-    font-weight: bold;
-}
-
-.chat-messages {
-    flex: 1;
-    padding: 25px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.system-message {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.message-bubble {
-    max-width: 70%;
-    padding: 15px 20px;
-    border-radius: var(--radius-lg);
-    line-height: 1.5;
-    word-wrap: break-word;
-    animation: bubbleAppear 0.3s ease-out;
-}
-
-@keyframes bubbleAppear {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.message-bubble.system {
-    background: rgba(100, 181, 246, 0.1);
-    color: var(--color-text);
-    margin: 0 auto;
-    text-align: center;
-    border: 1px solid rgba(100, 181, 246, 0.2);
-    font-size: 0.95rem;
-}
-
-.chat-input-area {
-    padding: 25px;
-    border-top: 1px solid var(--color-border);
-    background: white;
-    display: flex;
-    gap: 15px;
-    align-items: flex-end;
-}
-
-.input-container {
-    flex: 1;
-    position: relative;
-}
-
-#messageInput {
-    width: 100%;
-    padding: 18px 20px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    font-size: 1rem;
-    background: rgba(255, 255, 255, 0.95);
-    transition: all var(--transition-fast);
-}
-
-#messageInput:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(71, 118, 230, 0.1);
-}
-
-.input-info {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 8px;
-    font-size: 0.85rem;
-    color: var(--color-text-light);
-}
-
-#charCount {
-    color: var(--color-text);
-}
-
-.send-btn {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-    color: white;
-    border: none;
-    border-radius: var(--radius-xl);
-    padding: 18px 30px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition-normal);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 120px;
-    justify-content: center;
-}
-
-.send-btn:hover:not(:disabled) {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(71, 118, 230, 0.3);
-}
-
-.send-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* ===== 海鸥动画 ===== */
-.seagulls {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 2;
-}
-
-.seagull {
-    position: absolute;
-    font-size: 2rem;
-    animation: seagullFly var(--duration) linear infinite;
-    animation-delay: var(--delay);
-    top: var(--start);
-    left: var(--start);
-}
-
-@keyframes seagullFly {
-    0% {
-        transform: translate(0, 0) rotate(0deg);
-        opacity: 0;
-    }
-    10% {
-        opacity: 1;
-    }
-    90% {
-        opacity: 1;
-    }
-    100% {
-        transform: translate(100vw, 100vh) rotate(360deg);
-        opacity: 0;
-    }
-}
-
-/* ===== 响应式设计 ===== */
-@media (max-width: 768px) {
-    .app-header h1 {
-        font-size: 2.8rem;
-    }
-    
-    .emotion-flower {
-        width: 100px;
-        height: 100px;
-    }
-    
-    .emotion-text {
-        font-size: 1.1rem;
-        margin-top: 40px;
-    }
-    
-    .primary-btn {
-        min-width: 100%;
-        padding: 16px 30px;
-    }
-    
-    .features {
-        gap: 20px;
-    }
-    
-    .feature {
-        font-size: 0.85rem;
-    }
-    
-    .chat-header {
-        padding: 15px 20px;
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .header-left, .header-center, .header-right {
-        width: 100%;
-        text-align: center;
-    }
-    
-    .timer {
-        justify-content: center;
-        margin-top: 10px;
-    }
-    
-    .message-bubble {
-        max-width: 85%;
-    }
-    
-    .chat-input-area {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .send-btn {
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .app-container {
-        padding: 10px;
-    }
-    
-    .emotion-row {
-        gap: 20px;
-    }
-    
-    .emotion-flower {
-        width: 85px;
-        height: 85px;
-    }
-    
-    .emotion-text {
-        font-size: 1rem;
-        margin-top: 35px;
-    }
-    
-    .primary-btn {
-        font-size: 1.1rem;
-        padding: 14px 25px;
-    }
-}
+    <!-- 脚本 -->
+    <script src="supabase-client.js"></script>
+    <script src="match-engine.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
