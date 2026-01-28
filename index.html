@@ -1,5 +1,20 @@
-
-        <div id="emotionScene" class="scene active">
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>春暖花开 - 匿名情绪支持</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+</head>
+<body>
+    <!-- 花瓣效果容器 -->
+    <div id="petal-container"></div>
+    
+    <!-- 主应用 -->
+    <div class="app-container">
+        <!-- 场景1：情绪选择 -->
+        <div id="sceneEmotion" class="scene active">
             <header class="app-header">
                 <h1>🌊 春暖花开</h1>
                 <p class="tagline">每一次倾诉，都是内心的春暖花开</p>
@@ -7,76 +22,60 @@
             
             <main class="main-content">
                 <div class="instruction">
-                    <p>面朝大海，感受此刻。请选择最能代表你此刻的情绪：</p>
+                    <p>选择你此刻最真实的情绪：</p>
                 </div>
                 
-                <!-- 九大情绪之花 -->
                 <div class="emotion-garden">
-                    <div class="emotion-row">
-                        <button class="emotion-flower" data-emotion="开心" data-color="#FFD93D">
-                            <div class="petal-layer"></div>
-                            <span class="emotion-text">开心</span>
-                            <div class="flower-center"></div>
-                        </button>
-                        
-                        <button class="emotion-flower" data-emotion="烦躁" data-color="#FF8E6B">
-                            <div class="petal-layer"></div>
-                            <span class="emotion-text">烦躁</span>
-                            <div class="flower-center"></div>
-                        </button>
-                        
-                        <button class="emotion-flower" data-emotion="低落" data-color="#6C9BCF">
-                            <div class="petal-layer"></div>
-                            <span class="emotion-text">低落</span>
-                            <div class="flower-center"></div>
-                        </button>
-                    </div>
+                    <button class="emotion-flower" data-emotion="开心">
+                        <div class="flower-petals"></div>
+                        <span class="emotion-text">开心</span>
+                    </button>
                     
-                    <div class="emotion-row">
-                        <button class="emotion-flower" data-emotion="快乐" data-color="#FF6B8B">
-                            <div class="petal-layer"></div>
-                            <span class="emotion-text">快乐</span>
-                            <div class="flower-center"></div>
-                        </button>
-                        
-                        <button class="emotion-flower" data-emotion="焦虑" data-color="#FFA726">
-                            <div class="petal-layer"></div>
-                            <span class="emotion-text">焦虑</span>
-                            <div class="flower-center"></div>
-                        </button>
-                        
-                        <button class="emotion-flower" data-emotion="纠结" data-color="#A29BFE">
-                            <div class="petal-layer"></div>
-                            <span class="emotion-text">纠结</span>
-                            <div class="flower-center"></div>
-                        </button>
-                    </div>
+                    <button class="emotion-flower" data-emotion="烦躁">
+                        <div class="flower-petals"></div>
+                        <span class="emotion-text">烦躁</span>
+                    </button>
                     
-                    <div class="emotion-row">
-                        <button class="emotion-flower" data-emotion="受伤" data-color="#E66767">
-                            <div class="petal-layer"></div>
-                            <span class="emotion-text">受伤</span>
-                            <div class="flower-center"></div>
-                        </button>
-                        
-                        <button class="emotion-flower" data-emotion="不安" data-color="#74B9FF">
-                            <div class="petal-layer"></div>
-                            <span class="emotion-text">不安</span>
-                            <div class="flower-center"></div>
-                        </button>
-                        
-                        <button class="emotion-flower" data-emotion="懵了" data-color="#B2BEC3">
-                            <div class="petal-layer"></div>
-                            <span class="emotion-text">懵了</span>
-                            <div class="flower-center"></div>
-                        </button>
-                    </div>
+                    <button class="emotion-flower" data-emotion="低落">
+                        <div class="flower-petals"></div>
+                        <span class="emotion-text">低落</span>
+                    </button>
+                    
+                    <button class="emotion-flower" data-emotion="快乐">
+                        <div class="flower-petals"></div>
+                        <span class="emotion-text">快乐</span>
+                    </button>
+                    
+                    <button class="emotion-flower" data-emotion="焦虑">
+                        <div class="flower-petals"></div>
+                        <span class="emotion-text">焦虑</span>
+                    </button>
+                    
+                    <button class="emotion-flower" data-emotion="纠结">
+                        <div class="flower-petals"></div>
+                        <span class="emotion-text">纠结</span>
+                    </button>
+                    
+                    <button class="emotion-flower" data-emotion="受伤">
+                        <div class="flower-petals"></div>
+                        <span class="emotion-text">受伤</span>
+                    </button>
+                    
+                    <button class="emotion-flower" data-emotion="不安">
+                        <div class="flower-petals"></div>
+                        <span class="emotion-text">不安</span>
+                    </button>
+                    
+                    <button class="emotion-flower" data-emotion="懵了">
+                        <div class="flower-petals"></div>
+                        <span class="emotion-text">懵了</span>
+                    </button>
                 </div>
                 
                 <div class="action-section">
-                    <button id="startMatchBtn" class="primary-btn" disabled>
+                    <button id="btnStartMatch" class="primary-btn" disabled>
                         <span class="btn-icon">🌊</span>
-                        <span class="btn-text">面朝大海，开始匹配</span>
+                        <span class="btn-text">开始匹配相似感受</span>
                     </button>
                     
                     <div class="features">
@@ -90,19 +89,19 @@
                         </div>
                         <div class="feature">
                             <span class="feature-icon">🔒</span>
-                            <span>用完即走</span>
+                            <span>安全加密</span>
                         </div>
                     </div>
                     
                     <p class="safety-note">
-                        🌈 请勿分享个人信息，所有对话均受内容过滤保护
+                        请勿分享个人信息，所有对话均受内容过滤保护
                     </p>
                 </div>
             </main>
         </div>
         
         <!-- 场景2：匹配中 -->
-        <div id="matchingScene" class="scene">
+        <div id="sceneMatching" class="scene">
             <header class="app-header">
                 <h1>🌊 春暖花开</h1>
                 <p class="tagline">正在海面上寻找相似的感受...</p>
@@ -111,17 +110,11 @@
             <main class="main-content">
                 <div class="matching-animation">
                     <div class="wave"></div>
-                    <div class="wave delay-1"></div>
-                    <div class="wave delay-2"></div>
+                    <div class="wave wave-2"></div>
                     
-                    <div class="floating-flowers">
-                        <div class="floating-flower" style="--delay: 0s; --color: #FFD93D"></div>
-                        <div class="floating-flower" style="--delay: 1s; --color: #6C9BCF"></div>
-                        <div class="floating-flower" style="--delay: 2s; --color: #FF6B8B"></div>
-                    </div>
-                    
-                    <div class="searching-text">
-                        <p>正在为你寻找此刻能理解你<span id="selectedEmotionDisplay">开心</span>的人</p>
+                    <div class="searching-content">
+                        <div class="loading-spinner"></div>
+                        <p>正在为你寻找此刻能理解你 <span id="currentEmotion">开心</span> 的人</p>
                         <div class="loading-dots">
                             <span></span>
                             <span></span>
@@ -130,74 +123,53 @@
                     </div>
                 </div>
                 
-                <div class="match-info">
-                    <div class="info-card">
-                        <span class="info-icon">👥</span>
-                        <div class="info-content">
-                            <h3>基于情绪匹配</h3>
-                            <p>系统正根据你选择的情绪标签，寻找此刻有相似感受的陌生人</p>
-                        </div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <span class="info-icon">⚡</span>
-                        <div class="info-content">
-                            <h3>实时匿名连接</h3>
-                            <p>匹配成功后，将建立安全的临时连接，开启30分钟限时对话</p>
-                        </div>
-                    </div>
-                </div>
-                
                 <div class="action-section">
-                    <button id="cancelMatchBtn" class="secondary-btn">
+                    <button id="btnCancelMatch" class="secondary-btn">
                         <span class="btn-icon">↩️</span>
-                        <span class="btn-text">取消匹配，重新选择</span>
+                        <span class="btn-text">取消匹配</span>
                     </button>
                 </div>
             </main>
         </div>
         
         <!-- 场景3：聊天室 -->
-        <div id="chatScene" class="scene">
+        <div id="sceneChat" class="scene">
             <header class="chat-header">
                 <div class="header-left">
-                    <button id="endChatBtn" class="icon-btn" title="结束对话">
+                    <button id="btnEndChat" class="icon-btn" title="结束对话">
                         ⏹️
                     </button>
                 </div>
                 
                 <div class="header-center">
-                    <h2>春暖花开 · 匿名倾诉</h2>
+                    <h2>匿名倾诉中</h2>
                     <div class="chat-status">
                         <span class="status-icon">🌸</span>
-                        <span class="status-text">基于情绪匹配</span>
+                        <span>基于情绪匹配</span>
                     </div>
                 </div>
                 
                 <div class="header-right">
                     <div class="timer">
                         <span class="timer-icon">⏱️</span>
-                        <span id="countdown">30:00</span>
+                        <span id="timerDisplay">30:00</span>
                     </div>
                 </div>
             </header>
             
             <main class="chat-main">
-                <!-- 匹配成功欢迎 -->
+                <!-- 欢迎消息 -->
                 <div class="welcome-message">
-                    <div class="welcome-content">
-                        <div class="welcome-icon">🌊</div>
-                        <div class="welcome-text">
-                            <h3>海浪带来了相似的感受</h3>
-                            <p>你们彼此选择了 <span id="matchedEmotionDisplay">开心</span> 的情绪</p>
-                            <p class="hint">这是一次完全匿名的限时对话，请保持尊重与善意</p>
-                        </div>
+                    <div class="welcome-icon">🌊</div>
+                    <div class="welcome-text">
+                        <h3>海浪带来了相似的感受</h3>
+                        <p>你们彼此选择了 <span id="matchedEmotion">开心</span> 的情绪</p>
+                        <p class="hint">这是一次完全匿名的限时对话，请保持尊重与善意</p>
                     </div>
                 </div>
                 
-                <!-- 聊天消息区域 -->
+                <!-- 消息区域 -->
                 <div id="chatMessages" class="chat-messages">
-                    <!-- 消息会动态插入到这里 -->
                     <div class="system-message">
                         <div class="message-bubble system">
                             <p>对话已开始，请勿分享个人信息。30分钟后连接将自动断开。</p>
@@ -205,22 +177,21 @@
                     </div>
                 </div>
                 
-                <!-- 聊天输入区域 -->
+                <!-- 输入区域 -->
                 <div class="chat-input-area">
                     <div class="input-container">
-                        <input 
-                            type="text" 
-                            id="messageInput" 
+                        <textarea 
+                            id="inputMessage" 
                             placeholder="写下你想说的话（内容经过安全过滤）..." 
                             maxlength="500"
-                        >
+                            rows="1"
+                        ></textarea>
                         <div class="input-info">
                             <span id="charCount">0/500</span>
-                            <span class="hint">按下 Enter 发送</span>
                         </div>
                     </div>
                     
-                    <button id="sendMessageBtn" class="send-btn">
+                    <button id="btnSendMessage" class="send-btn" disabled>
                         <span class="send-icon">🌸</span>
                         <span class="send-text">发送</span>
                     </button>
@@ -229,16 +200,8 @@
         </div>
     </div>
     
-    <!-- 海鸥动画背景元素 -->
-    <div class="seagulls">
-        <div class="seagull" style="--delay: 0s; --duration: 25s; --start: -10%"></div>
-        <div class="seagull" style="--delay: 7s; --duration: 30s; --start: -15%"></div>
-        <div class="seagull" style="--delay: 15s; --duration: 20s; --start: -5%"></div>
-    </div>
-    
     <!-- 脚本 -->
-    <script src="supabase-client.js"></script>
-    <script src="match-engine.js"></script>
-    <script src="main.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
 </body>
 </html>
