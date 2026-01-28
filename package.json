@@ -1,6 +1,20 @@
 {
   "name": "spring-blossom",
   "version": "1.0.0",
-  "description": "春暖花开 - 静态部署版",
-  "scripts": {}
+  "private": true,
+  "description": "春暖花开 - 匿名情绪支持平台",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod",
+    "cleanup": "node scripts/cleanup.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.0.0"
+  }
 }
