@@ -1,637 +1,742 @@
-/**
- * 创建花瓣飘落效果 - 春暖花开视觉反馈
- * @param {number} count - 花瓣数量，默认30
- * @param {string} emotion - 情绪标签，用于影响花瓣色调
- */
-function createPetals(count = 30, emotion = null) {
-    // 确保容器存在
-    let container = document.getElementById('petal-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'petal-container';
-        document.body.appendChild(container);
-    }
-    
-    // 清理过多花瓣（性能优化）
-    if (container.children.length > 100) {
-        const excess = container.children.length - 70;
-        for (let i = 0; i < excess; i++) {
-            if (container.firstChild) container.removeChild(container.firstChild);
-        }
-    }
-    
-    // 情绪对应的主色调映射（用于花瓣颜色）
-    const emotionHues = {
-        '开心': { min: 45, max: 65 },    // 黄色系
-        '烦躁': { min: 15, max: 25 },    // 橙色系
-        '低落': { min: 200, max: 220 },  // 蓝色系
-        '快乐': { min: 330, max: 350 },  // 粉色系
-        '焦虑': { min: 30, max: 45 },    // 琥珀色系
-        '纠结': { min: 250, max: 270 },  // 紫色系
-        '受伤': { min: 350, max: 10 },   // 红色/粉色系
-        '不安': { min: 190, max: 210 },  // 冷蓝色系
-        '懵了': { min: 0, max: 0 }       // 灰色，特殊处理
-    };
-    
-    // 创建花瓣
-    for (let i = 0; i < count; i++) {
-        const petal = document.createElement('div');
-        petal.className = 'petal';
-        
-        // 随机水平位置
-        petal.style.left = Math.random() * 100 + 'vw';
-        
-        // 花瓣颜色逻辑
-        let hue, saturation, lightness;
-        if (emotion && emotionHues[emotion]) {
-            const hueRange = emotionHues[emotion];
-            if (emotion === '懵了') {
-                // 灰色花瓣
-                hue = 0;
-                saturation = 0;
-                lightness = Math.random() * 30 + 60;
-            } else {
-                hue = hueRange.min + Math.random() * (hueRange.max - hueRange.min);
-                saturation = Math.random() * 30 + 60;
-                lightness = Math.random() * 20 + 60;
-            }
-        } else {
-            // 默认随机春色
-            hue = Math.random() * 60 + 300; // 偏粉紫色调
-            saturation = Math.random() * 30 + 60;
-            lightness = Math.random() * 20 + 65;
-        }
-        
-        petal.style.background = `linear-gradient(135deg, 
-            hsl(${hue}, ${saturation}%, ${lightness}%), 
-            hsl(${hue}, ${saturation}%, ${lightness - 15}%)
-        )`;
-        
-        // 随机大小和旋转
-        const size = 15 + Math.random() * 15;
-        petal.style.width = size + 'px';
-        petal.style.height = size + 'px';
-        const rotate = Math.random() * 360;
-        petal.style.borderRadius = `50% 0 50% ${Math.random() * 30 + 40}%`;
-        
-        // 随机动画参数
-        const duration = 8 + Math.random() * 12;
-        const delay = Math.random() * 5;
-        const drift = (Math.random() - 0.5) * 100; // 水平漂移
-        
-        petal.style.animation = `petalFall ${duration}s linear ${delay}s forwards`;
-        petal.style.setProperty('--drift', `${drift}px`);
-        
-        // 添加自定义属性跟踪
-        petal.setAttribute('data-created', Date.now());
-        
-        container.appendChild(petal);
-        
-        // 动画结束后移除元素（考虑动画时间+延迟）
-        setTimeout(() => {
-            if (petal.parentNode === container) {
-                container.removeChild(petal);
-            }
-        }, (duration + delay) * 1000);
-    }
-}
-
-// 扩展CSS支持水平漂移（需动态添加）
-if (!document.querySelector('#petal-animation-style')) {
-    const style = document.createElement('style');
-    style.id = 'petal-animation-style';
-    style.textContent = `
-        @keyframes petalFall {
-            0% {
-                transform: translateY(0) translateX(0) rotate(0deg);
-                opacity: 0.9;
-            }
-            100% {
-                transform: translateY(calc(100vh + 30px)) translateX(var(--drift, 0)) rotate(360deg);
-                opacity: 0;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-}
-
-/**
- * 触发花瓣效果的关键事件绑定示例
- * 在实际集成时，请在以下时机调用 createPetals():
- * 1. 用户选择情绪标签时（可选，少量花瓣）
- * 2. 匹配成功时（建议，中等数量）
- * 3. 收到第一条消息或连接建立时（建议，少量花瓣）
- * 
- * 示例：document.querySelector('.emotion-tag').addEventListener('click', function() {
- *   const emotion = this.dataset.emotion;
- *   createPetals(15, emotion);
- * });
- */// 春暖花开 - 主应用程序逻辑
-import { initializeSupabase } from './supabase-client.js';
-import { startMatching, cancelMatching, sendMessage, endSession } from './match-engine.js';
+// ===== 春暖花开 - 主应用逻辑 =====
+// 版本: 1.0.0
+// 对应HTML: 完整版index.html
 
 class SpringBlossomApp {
     constructor() {
-        this.currentScreen = 'welcome';
-        this.selectedEmotion = null;
-        this.sessionId = null;
-        this.userId = this.generateUserId();
-        this.sessionTimer = null;
-        this.timeRemaining = 30 * 60; // 30分钟
-        this.messageCount = 0;
-        this.supabase = null;
+        // 应用状态
+        this.state = {
+            currentScene: 'emotion', // emotion | matching | chat
+            selectedEmotion: null,
+            matchId: null,
+            partnerId: null,
+            sessionId: null,
+            messages: [],
+            isConnected: false,
+            timeLeft: 30 * 60, // 30分钟，单位秒
+            timerInterval: null,
+            isTyping: false,
+            partnerTyping: false
+        };
+
+        // DOM 元素引用
+        this.elements = {};
         
-        this.initializeApp();
+        // 初始化
+        this.initDOM();
+        this.initEventListeners();
+        this.initSupabase();
+        
+        // 花瓣系统
+        this.initPetalSystem();
+        
+        console.log('春暖花开应用初始化完成');
     }
 
-    // 生成匿名用户ID
-    generateUserId() {
-        return 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+    // ===== 1. DOM 初始化 =====
+    initDOM() {
+        // 场景容器
+        this.elements.scenes = {
+            emotion: document.getElementById('emotionScene'),
+            matching: document.getElementById('matchingScene'),
+            chat: document.getElementById('chatScene')
+        };
+
+        // 情绪选择
+        this.elements.emotionFlowers = document.querySelectorAll('.emotion-flower');
+        this.elements.startMatchBtn = document.getElementById('startMatchBtn');
+        this.elements.selectedEmotionDisplay = document.getElementById('selectedEmotionDisplay');
+        this.elements.matchedEmotionDisplay = document.getElementById('matchedEmotionDisplay');
+
+        // 匹配场景
+        this.elements.cancelMatchBtn = document.getElementById('cancelMatchBtn');
+
+        // 聊天场景
+        this.elements.endChatBtn = document.getElementById('endChatBtn');
+        this.elements.messageInput = document.getElementById('messageInput');
+        this.elements.sendMessageBtn = document.getElementById('sendMessageBtn');
+        this.elements.chatMessages = document.getElementById('chatMessages');
+        this.elements.charCount = document.getElementById('charCount');
+        this.elements.countdown = document.getElementById('countdown');
+
+        // 更新字符计数显示
+        this.updateCharCount();
     }
 
-    // 初始化应用
-    async initializeApp() {
-        console.log('🌸 春暖花开应用初始化...');
-        
-        // 显示隐私声明
-        this.showPrivacyModal();
-        
-        // 初始化Supabase
-        this.supabase = await initializeSupabase();
-        if (!this.supabase) {
-            this.showError('无法连接到服务，请检查网络连接');
+    // ===== 2. 事件监听器 =====
+    initEventListeners() {
+        // 情绪花朵点击
+        this.elements.emotionFlowers.forEach(flower => {
+            flower.addEventListener('click', () => this.selectEmotion(flower));
+        });
+
+        // 开始匹配按钮
+        this.elements.startMatchBtn.addEventListener('click', () => this.startMatching());
+
+        // 取消匹配按钮
+        this.elements.cancelMatchBtn.addEventListener('click', () => this.cancelMatching());
+
+        // 消息输入
+        this.elements.messageInput.addEventListener('input', (e) => {
+            this.updateCharCount();
+            this.debounceTypingIndicator();
+        });
+
+        this.elements.messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.sendMessage();
+            }
+        });
+
+        // 发送消息按钮
+        this.elements.sendMessageBtn.addEventListener('click', () => this.sendMessage());
+
+        // 结束对话按钮
+        this.elements.endChatBtn.addEventListener('click', () => this.endChat());
+    }
+
+    // ===== 3. 情绪选择逻辑 =====
+    selectEmotion(flower) {
+        const emotion = flower.dataset.emotion;
+        const color = flower.dataset.color;
+
+        // 取消之前的选择
+        this.elements.emotionFlowers.forEach(f => {
+            f.classList.remove('selected');
+            f.style.setProperty('--emotion-color', f.dataset.color);
+        });
+
+        // 设置新选择
+        flower.classList.add('selected');
+        this.state.selectedEmotion = emotion;
+
+        // 启用开始匹配按钮
+        this.elements.startMatchBtn.disabled = false;
+        this.elements.startMatchBtn.innerHTML = `
+            <span class="btn-icon">🌊</span>
+            <span class="btn-text">面朝大海，开始匹配「${emotion}」</span>
+        `;
+
+        // 显示情绪
+        if (this.elements.selectedEmotionDisplay) {
+            this.elements.selectedEmotionDisplay.textContent = emotion;
+            this.elements.selectedEmotionDisplay.style.color = color;
+        }
+
+        // 触发少量花瓣效果
+        this.createPetals(8, emotion);
+
+        console.log(`选择了情绪: ${emotion}`);
+    }
+
+    // ===== 4. 匹配逻辑 =====
+    async startMatching() {
+        if (!this.state.selectedEmotion) {
+            this.showToast('请先选择一种情绪', 'warning');
             return;
         }
 
-        // 设置事件监听器
-        this.setupEventListeners();
+        // 切换到匹配场景
+        this.switchScene('matching');
         
-        // 生成情绪气泡
-        this.generateEmotionBubbles();
-        
-        // 检查是否有恢复的会话
-        this.checkForRecovery();
-        
-        console.log('✅ 应用初始化完成');
-    }
-
-    // 显示隐私声明
-    showPrivacyModal() {
-        const modal = document.getElementById('privacyModal');
-        modal.style.display = 'flex';
-        
-        document.getElementById('agreePrivacyBtn').onclick = () => {
-            modal.style.display = 'none';
-            localStorage.setItem('privacyAgreed', 'true');
-        };
-        
-        document.getElementById('declineBtn').onclick = () => {
-            window.location.href = 'about:blank';
-        };
-        
-        // 如果之前已同意，自动隐藏
-        if (localStorage.getItem('privacyAgreed') === 'true') {
-            modal.style.display = 'none';
-        }
-    }
-
-    // 生成情绪气泡
-    generateEmotionBubbles() {
-        const emotions = [
-            { id: 'happy', text: '😊 开心', color: '#FFD700' },
-            { id: 'anxious', text: '😰 焦虑', color: '#FF6B6B' },
-            { id: 'sad', text: '😔 低落', color: '#4ECDC4' },
-            { id: 'angry', text: '😤 烦躁', color: '#FF8E53' },
-            { id: 'joyful', text: '😄 快乐', color: '#FFD166' },
-            { id: 'confused', text: '🤔 纠结', color: '#06D6A0' },
-            { id: 'hurt', text: '😢 受伤', color: '#118AB2' },
-            { id: 'uneasy', text: '😟 不安', color: '#EF476F' },
-            { id: 'lost', text: '😵 懵了', color: '#073B4C' }
-        ];
-
-        const grid = document.getElementById('emotionGrid');
-        grid.innerHTML = '';
-
-        emotions.forEach(emotion => {
-            const bubble = document.createElement('div');
-            bubble.className = 'emotion-bubble';
-            bubble.dataset.emotion = emotion.id;
-            bubble.dataset.text = emotion.text;
-            bubble.style.borderColor = emotion.color;
-            bubble.innerHTML = emotion.text;
-            
-            bubble.onclick = () => this.selectEmotion(emotion.id, emotion.text);
-            grid.appendChild(bubble);
-        });
-
-        // 自定义情绪按钮
-        document.getElementById('createCustomBtn').onclick = () => {
-            const customSection = document.getElementById('customEmotionSection');
-            customSection.style.display = customSection.style.display === 'none' ? 'flex' : 'none';
-        };
-
-        document.getElementById('submitCustomEmotion').onclick = () => {
-            const input = document.getElementById('customEmotionInput');
-            const customEmotion = input.value.trim();
-            if (customEmotion) {
-                this.selectEmotion('custom', `💭 ${customEmotion}`);
-                input.value = '';
-                document.getElementById('customEmotionSection').style.display = 'none';
-            }
-        };
-    }
-
-    // 选择情绪
-    selectEmotion(emotionId, emotionText) {
-        // 移除之前的选择
-        document.querySelectorAll('.emotion-bubble.selected').forEach(bubble => {
-            bubble.classList.remove('selected');
-        });
-
-        // 标记当前选择
-        const selectedBubble = document.querySelector(`[data-emotion="${emotionId}"]`);
-        if (selectedBubble) {
-            selectedBubble.classList.add('selected');
+        // 显示匹配中的情绪
+        if (this.elements.selectedEmotionDisplay) {
+            this.elements.selectedEmotionDisplay.textContent = this.state.selectedEmotion;
         }
 
-        this.selectedEmotion = {
-            id: emotionId,
-            text: emotionText
-        };
-
-        // 开始匹配
-        this.startMatchingProcess();
-    }
-
-    // 开始匹配流程
-    async startMatchingProcess() {
-        if (!this.selectedEmotion) return;
-
-        this.switchScreen('matching');
-        
-        // 显示匹配的情绪
-        document.getElementById('matchedEmotionDisplay').textContent = this.selectedEmotion.text;
-        
-        // 更新匹配状态
-        const statusElement = document.getElementById('matchingStatus');
-        statusElement.textContent = '正在匹配中，请稍候';
-        
-        // 开始匹配
+        // 加入匹配队列
         try {
-            const matchResult = await startMatching(
-                this.supabase,
-                this.userId,
-                this.selectedEmotion.id,
-                this.selectedEmotion.text
-            );
-            
-            if (matchResult.success) {
-                this.sessionId = matchResult.sessionId;
-                this.startChatSession(matchResult);
-            } else {
-                this.showError('匹配失败，请稍后重试');
-                this.switchScreen('welcome');
-            }
+            const userId = this.generateUserId();
+            this.state.userId = userId;
+
+            // 这里需要连接Supabase的match_queue表
+            // const { data, error } = await supabase
+            //     .from('match_queue')
+            //     .insert({
+            //         user_id: userId,
+            //         emotion_tag: this.state.selectedEmotion,
+            //         emotion_text: this.state.selectedEmotion,
+            //         created_at: new Date().toISOString()
+            //     });
+
+            // if (error) throw error;
+
+            this.showToast('已加入匹配队列，正在寻找相似的感受...', 'info');
+
+            // 模拟匹配过程（实际应该用WebSocket监听匹配结果）
+            this.simulateMatching();
+
         } catch (error) {
-            console.error('匹配错误:', error);
-            this.showError('匹配过程中出现错误');
-            this.switchScreen('welcome');
+            console.error('加入匹配队列失败:', error);
+            this.showToast('匹配失败，请稍后重试', 'error');
+            this.switchScene('emotion');
         }
     }
 
-    // 开始聊天会话
-    startChatSession(matchData) {
-        this.sessionId = matchData.sessionId;
-        this.switchScreen('chat');
-        
-        // 设置聊天情绪标签
-        document.getElementById('chatEmotionTag').textContent = this.selectedEmotion.text;
-        
-        // 开始会话计时器
-        this.startSessionTimer();
-        
-        // 设置聊天事件监听器
-        this.setupChatListeners();
-        
-        // 订阅实时消息
-        this.subscribeToMessages();
-        
-        // 发送欢迎消息
-        this.sendWelcomeMessage();
+    simulateMatching() {
+        // 模拟匹配等待
+        setTimeout(() => {
+            // 匹配成功
+            this.matchSuccess();
+        }, 3000 + Math.random() * 7000); // 3-10秒随机
     }
 
-    // 开始会话计时器
-    startSessionTimer() {
-        this.timeRemaining = 30 * 60; // 30分钟
-        
-        const updateTimer = () => {
-            const minutes = Math.floor(this.timeRemaining / 60);
-            const seconds = this.timeRemaining % 60;
-            
-            document.getElementById('sessionTimer').textContent = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            document.getElementById('remainingTime').textContent = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            if (this.timeRemaining <= 0) {
-                clearInterval(this.sessionTimer);
-                this.endSessionAutomatically();
-                return;
-            }
-            
-            this.timeRemaining--;
-        };
-        
-        updateTimer();
-        this.sessionTimer = setInterval(updateTimer, 1000);
-    }
+    matchSuccess() {
+        // 生成模拟的匹配信息
+        this.state.matchId = this.generateSessionId();
+        this.state.partnerId = 'partner_' + Math.random().toString(36).substr(2, 9);
+        this.state.sessionId = this.state.matchId;
 
-    // 设置聊天事件监听器
-    setupChatListeners() {
-        // 发送消息
-        document.getElementById('sendMessageBtn').onclick = () => this.sendChatMessage();
-        
-        // 回车发送
-        document.getElementById('messageInput').onkeypress = (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                this.sendChatMessage();
-            }
-        };
-        
-        // 字符计数
-        document.getElementById('messageInput').oninput = (e) => {
-            document.getElementById('charCount').textContent = 
-                `${e.target.value.length}/500`;
-        };
-        
-        // 结束会话
-        document.getElementById('endSessionBtn').onclick = () => this.endSessionManually();
-        
-        // 取消匹配按钮
-        document.getElementById('cancelMatchBtn').onclick = () => {
-            if (this.sessionId) {
-                cancelMatching(this.supabase, this.sessionId);
-            }
-            this.switchScreen('welcome');
-        };
-    }
-
-    // 发送聊天消息
-    async sendChatMessage() {
-        const input = document.getElementById('messageInput');
-        const message = input.value.trim();
-        
-        if (!message || !this.sessionId) return;
-        
-        try {
-            const result = await sendMessage(
-                this.supabase,
-                this.sessionId,
-                this.userId,
-                message
-            );
-            
-            if (result.success) {
-                input.value = '';
-                document.getElementById('charCount').textContent = '0/500';
-                this.messageCount++;
-                
-                // 添加到消息列表
-                this.addMessageToChat(message, true);
-            } else {
-                this.showError('消息发送失败，可能包含敏感内容');
-            }
-        } catch (error) {
-            console.error('发送消息错误:', error);
-            this.showError('消息发送失败');
+        // 更新显示
+        if (this.elements.matchedEmotionDisplay) {
+            this.elements.matchedEmotionDisplay.textContent = this.state.selectedEmotion;
         }
+
+        // 大量花瓣庆祝
+        this.createPetals(50, this.state.selectedEmotion);
+
+        // 切换到聊天场景
+        this.switchScene('chat');
+        
+        // 开始计时器
+        this.startTimer();
+
+        // 添加欢迎消息
+        this.addSystemMessage('海浪带来了相似的感受，对话已开始。请保持尊重与善意。');
+        
+        // 模拟对方问候
+        setTimeout(() => {
+            this.addMessage({
+                sender: 'remote',
+                content: this.getGreetingByEmotion(this.state.selectedEmotion),
+                timestamp: new Date()
+            });
+        }, 1000);
+
+        this.showToast('匹配成功！开始匿名倾诉吧～', 'success');
     }
 
-    // 添加消息到聊天窗口
-    addMessageToChat(message, isSent = false) {
-        const messagesContainer = document.getElementById('chatMessages');
-        const messageElement = document.createElement('div');
+    cancelMatching() {
+        // 离开匹配队列（实际需要调用Supabase API）
+        // await supabase.from('match_queue').delete().eq('user_id', this.state.userId);
         
-        messageElement.className = `message ${isSent ? 'sent' : 'received'}`;
+        this.switchScene('emotion');
+        this.showToast('已取消匹配', 'info');
+    }
+
+    // ===== 5. 聊天逻辑 =====
+    async sendMessage() {
+        const input = this.elements.messageInput;
+        const content = input.value.trim();
+
+        if (!content) {
+            this.showToast('消息不能为空', 'warning');
+            return;
+        }
+
+        if (content.length > 500) {
+            this.showToast('消息过长，请精简内容', 'warning');
+            return;
+        }
+
+        // 安全检查
+        if (!this.checkContentSafety(content)) {
+            this.showToast('消息包含不合适的内容，请修改后发送', 'error');
+            return;
+        }
+
+        // 清空输入框
+        input.value = '';
+        this.updateCharCount();
+
+        // 添加自己的消息到界面
+        const message = {
+            sender: 'self',
+            content: content,
+            timestamp: new Date(),
+            messageId: 'msg_' + Date.now()
+        };
+
+        this.addMessage(message);
+        this.state.messages.push(message);
+
+        // 发送到服务器（实际需要WebSocket或Supabase）
+        // await this.sendMessageToServer(message);
+
+        // 模拟对方回复（实际应该通过WebSocket接收）
+        this.simulatePartnerReply(content);
+    }
+
+    simulatePartnerReply(myContent) {
+        // 模拟对方正在输入
+        this.showTypingIndicator(true);
+
+        setTimeout(() => {
+            this.showTypingIndicator(false);
+            
+            const reply = this.generateReply(myContent, this.state.selectedEmotion);
+            this.addMessage({
+                sender: 'remote',
+                content: reply,
+                timestamp: new Date(),
+                messageId: 'partner_' + Date.now()
+            });
+        }, 1000 + Math.random() * 3000);
+    }
+
+    addMessage(message) {
+        const messageEl = document.createElement('div');
+        messageEl.className = `message ${message.sender}`;
         
-        const time = new Date().toLocaleTimeString([], { 
+        const timeStr = message.timestamp.toLocaleTimeString([], { 
             hour: '2-digit', 
             minute: '2-digit' 
         });
-        
-        messageElement.innerHTML = `
-            <div class="message-text">${this.escapeHtml(message)}</div>
-            <div class="message-time">${time}</div>
+
+        messageEl.innerHTML = `
+            <div class="message-bubble ${message.sender}">
+                <div class="message-content">${this.escapeHtml(message.content)}</div>
+                <div class="message-time">${timeStr}</div>
+            </div>
         `;
+
+        this.elements.chatMessages.appendChild(messageEl);
         
-        messagesContainer.appendChild(messageElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        // 滚动到底部
+        this.scrollToBottom();
+        
+        // 收到对方消息时触发少量花瓣
+        if (message.sender === 'remote') {
+            this.createPetals(3, this.state.selectedEmotion);
+        }
     }
 
-    // 订阅实时消息
-    subscribeToMessages() {
-        if (!this.supabase || !this.sessionId) return;
-        
-        const channel = this.supabase
-            .channel(`chat_${this.sessionId}`)
-            .on('broadcast', { event: 'new_message' }, (payload) => {
-                if (payload.sender_id !== this.userId) {
-                    this.addMessageToChat(payload.content, false);
-                }
-            })
-            .subscribe();
-        
-        // 存储频道引用以便清理
-        this.chatChannel = channel;
+    addSystemMessage(text) {
+        const messageEl = document.createElement('div');
+        messageEl.className = 'system-message';
+        messageEl.innerHTML = `
+            <div class="message-bubble system">
+                <p>${this.escapeHtml(text)}</p>
+            </div>
+        `;
+        this.elements.chatMessages.appendChild(messageEl);
+        this.scrollToBottom();
     }
 
-    // 发送欢迎消息
-    sendWelcomeMessage() {
-        const welcomeMessages = [
-            "你好！我感受到了你的情绪，愿意倾听你的倾诉。",
-            "此刻，我们的感受相连。你可以放心地倾诉。",
-            "匿名让我们更真实，30分钟的倾诉空间已为你开启。",
-            "每一个情绪都值得被听见，我在这里倾听。"
-        ];
-        
-        const randomMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
-        
-        // 延迟显示欢迎消息
-        setTimeout(() => {
-            this.addMessageToChat(randomMessage, false);
+    // ===== 6. 定时器管理 =====
+    startTimer() {
+        // 清除已有定时器
+        if (this.state.timerInterval) {
+            clearInterval(this.state.timerInterval);
+        }
+
+        this.state.timeLeft = 30 * 60; // 30分钟
+        this.updateTimerDisplay();
+
+        this.state.timerInterval = setInterval(() => {
+            this.state.timeLeft--;
+            this.updateTimerDisplay();
+
+            // 最后5分钟警告
+            if (this.state.timeLeft === 5 * 60) {
+                this.showToast('对话将在5分钟后结束', 'warning');
+                this.addSystemMessage('温馨提示：对话将在5分钟后自动结束。');
+            }
+
+            // 时间结束
+            if (this.state.timeLeft <= 0) {
+                this.endChat('timeout');
+                clearInterval(this.state.timerInterval);
+            }
         }, 1000);
     }
 
-    // 自动结束会话
-    async endSessionAutomatically() {
-        if (!this.sessionId) return;
+    updateTimerDisplay() {
+        if (!this.elements.countdown) return;
+
+        const minutes = Math.floor(this.state.timeLeft / 60);
+        const seconds = this.state.timeLeft % 60;
+        this.elements.countdown.textContent = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         
-        try {
-            await endSession(this.supabase, this.sessionId);
-            this.showEndScreen();
-        } catch (error) {
-            console.error('结束会话错误:', error);
-            this.showEndScreen();
+        // 颜色变化
+        if (this.state.timeLeft < 300) { // 最后5分钟变红色
+            this.elements.countdown.style.color = '#f44336';
+        } else if (this.state.timeLeft < 600) { // 最后10分钟变橙色
+            this.elements.countdown.style.color = '#FF9800';
         }
     }
 
-    // 手动结束会话
-    async endSessionManually() {
-        if (confirm('确定要结束这次对话吗？')) {
-            clearInterval(this.sessionTimer);
-            await this.endSessionAutomatically();
-        }
-    }
-
-    // 显示结束屏幕
-    showEndScreen() {
-        this.switchScreen('end');
-        
-        // 清理资源
-        if (this.chatChannel) {
-            this.supabase.removeChannel(this.chatChannel);
-        }
-        
-        // 显示统计信息
-        const duration = 30 - Math.ceil(this.timeRemaining / 60);
-        document.getElementById('sessionDuration').textContent = duration;
-        document.getElementById('messageCount').textContent = this.messageCount;
-        
-        // 设置结束页面按钮事件
-        document.getElementById('newSessionBtn').onclick = () => {
-            this.resetForNewSession();
-            this.switchScreen('welcome');
-        };
-        
-        document.getElementById('feedbackBtn').onclick = () => {
-            this.switchScreen('feedback');
-        };
-    }
-
-    // 重置为新会话
-    resetForNewSession() {
-        this.selectedEmotion = null;
-        this.sessionId = null;
-        this.messageCount = 0;
-        this.timeRemaining = 30 * 60;
-        
-        // 清除聊天消息
-        document.getElementById('chatMessages').innerHTML = '';
-        document.getElementById('messageInput').value = '';
-        document.getElementById('charCount').textContent = '0/500';
-        
-        // 重置情绪选择
-        document.querySelectorAll('.emotion-bubble.selected').forEach(bubble => {
-            bubble.classList.remove('selected');
+    // ===== 7. 场景管理 =====
+    switchScene(sceneName) {
+        // 隐藏所有场景
+        Object.values(this.elements.scenes).forEach(scene => {
+            if (scene) scene.classList.remove('active');
         });
+
+        // 显示目标场景
+        if (this.elements.scenes[sceneName]) {
+            this.elements.scenes[sceneName].classList.add('active');
+            this.state.currentScene = sceneName;
+        }
+
+        // 场景特定初始化
+        if (sceneName === 'chat') {
+            setTimeout(() => this.scrollToBottom(), 100);
+        }
     }
 
-    // 检查是否有可恢复的会话
-    checkForRecovery() {
-        const savedSession = localStorage.getItem('currentSession');
-        if (savedSession) {
-            const session = JSON.parse(savedSession);
-            const elapsed = Date.now() - session.timestamp;
-            
-            // 如果会话在30分钟内
-            if (elapsed < 30 * 60 * 1000) {
-                if (confirm('检测到未完成的会话，是否恢复？')) {
-                    this.sessionId = session.sessionId;
-                    this.userId = session.userId;
-                    this.selectedEmotion = session.emotion;
-                    this.startChatSession({ sessionId: session.sessionId });
-                } else {
-                    localStorage.removeItem('currentSession');
+    endChat(reason = 'manual') {
+        // 清除定时器
+        if (this.state.timerInterval) {
+            clearInterval(this.state.timerInterval);
+            this.state.timerInterval = null;
+        }
+
+        // 显示结束消息
+        let endMessage = '对话已结束。';
+        if (reason === 'timeout') {
+            endMessage = '30分钟时间到，对话已自动结束。';
+        } else if (reason === 'partner_left') {
+            endMessage = '对方已离开，对话结束。';
+        }
+
+        this.addSystemMessage(endMessage);
+        this.showToast(endMessage, 'info');
+
+        // 10秒后返回情绪选择
+        setTimeout(() => {
+            this.resetChat();
+            this.switchScene('emotion');
+        }, 10000);
+    }
+
+    resetChat() {
+        // 清空聊天记录
+        if (this.elements.chatMessages) {
+            this.elements.chatMessages.innerHTML = '';
+        }
+
+        // 清空输入
+        if (this.elements.messageInput) {
+            this.elements.messageInput.value = '';
+            this.updateCharCount();
+        }
+
+        // 重置状态
+        this.state.messages = [];
+        this.state.sessionId = null;
+        this.state.partnerId = null;
+        this.state.matchId = null;
+        this.state.timeLeft = 30 * 60;
+    }
+
+    // ===== 8. 花瓣系统 =====
+    initPetalSystem() {
+        // 花瓣容器
+        let container = document.getElementById('petal-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'petal-container';
+            container.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(container);
+        }
+        this.petalContainer = container;
+    }
+
+    createPetals(count = 20, emotion = null) {
+        // 情绪颜色映射
+        const emotionColors = {
+            '开心': { hue: 50, saturation: 80 },   // 黄色
+            '烦躁': { hue: 20, saturation: 85 },   // 橙色
+            '低落': { hue: 210, saturation: 60 },  // 蓝色
+            '快乐': { hue: 340, saturation: 85 },  // 粉色
+            '焦虑': { hue: 35, saturation: 90 },   // 琥珀色
+            '纠结': { hue: 260, saturation: 70 },  // 紫色
+            '受伤': { hue: 355, saturation: 70 },  // 暗粉
+            '不安': { hue: 200, saturation: 80 },  // 亮蓝
+            '懵了': { hue: 0, saturation: 0 }      // 灰色
+        };
+
+        // 清理过多花瓣（性能优化）
+        if (this.petalContainer.children.length > 80) {
+            const excess = this.petalContainer.children.length - 60;
+            for (let i = 0; i < excess; i++) {
+                if (this.petalContainer.firstChild) {
+                    this.petalContainer.removeChild(this.petalContainer.firstChild);
                 }
-            } else {
-                localStorage.removeItem('currentSession');
             }
         }
+
+        for (let i = 0; i < count; i++) {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+
+            // 设置颜色
+            let hue, saturation, lightness;
+            if (emotion && emotionColors[emotion]) {
+                const color = emotionColors[emotion];
+                hue = emotion === '懵了' ? 0 : color.hue + (Math.random() * 20 - 10);
+                saturation = color.saturation;
+                lightness = 60 + Math.random() * 20;
+            } else {
+                hue = Math.random() * 360;
+                saturation = 60 + Math.random() * 30;
+                lightness = 60 + Math.random() * 20;
+            }
+
+            petal.style.background = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+
+            // 随机位置和大小
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.width = (10 + Math.random() * 15) + 'px';
+            petal.style.height = petal.style.width;
+
+            // 随机动画参数
+            const duration = 5 + Math.random() * 10;
+            const delay = Math.random() * 3;
+            const drift = (Math.random() - 0.5) * 100;
+
+            petal.style.animation = `petalFall ${duration}s linear ${delay}s forwards`;
+            petal.style.setProperty('--drift', `${drift}px`);
+
+            this.petalContainer.appendChild(petal);
+
+            // 动画结束后移除
+            setTimeout(() => {
+                if (petal.parentNode === this.petalContainer) {
+                    this.petalContainer.removeChild(petal);
+                }
+            }, (duration + delay) * 1000);
+        }
     }
 
-    // 切换屏幕
-    switchScreen(screenName) {
-        // 隐藏所有屏幕
-        document.querySelectorAll('.screen').forEach(screen => {
-            screen.classList.remove('active');
-        });
+    // ===== 9. 工具函数 =====
+    generateUserId() {
+        return 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    }
+
+    generateSessionId() {
+        return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    }
+
+    updateCharCount() {
+        if (!this.elements.messageInput || !this.elements.charCount) return;
+        const length = this.elements.messageInput.value.length;
+        this.elements.charCount.textContent = `${length}/500`;
         
-        // 显示目标屏幕
-        const targetScreen = document.querySelector(`.${screenName}-screen`);
-        if (targetScreen) {
-            targetScreen.classList.add('active');
-            this.currentScreen = screenName;
-        }
-        
-        // 保存当前会话
-        if (screenName === 'chat' && this.sessionId) {
-            localStorage.setItem('currentSession', JSON.stringify({
-                sessionId: this.sessionId,
-                userId: this.userId,
-                emotion: this.selectedEmotion,
-                timestamp: Date.now()
-            }));
-        }
-        
-        // 清除保存的会话
-        if (screenName === 'welcome') {
-            localStorage.removeItem('currentSession');
+        // 颜色提示
+        if (length > 450) {
+            this.elements.charCount.style.color = '#f44336';
+        } else if (length > 300) {
+            this.elements.charCount.style.color = '#FF9800';
+        } else {
+            this.elements.charCount.style.color = '';
         }
     }
 
-    // 显示错误
-    showError(message) {
-        alert(`⚠️ ${message}`);
+    scrollToBottom() {
+        if (this.elements.chatMessages) {
+            this.elements.chatMessages.scrollTop = this.elements.chatMessages.scrollHeight;
+        }
     }
 
-    // HTML转义
+    showTypingIndicator(show) {
+        // 实现打字指示器
+        // 可以添加一个显示"对方正在输入..."的UI元素
+        this.state.partnerTyping = show;
+    }
+
+    debounceTypingIndicator() {
+        // 防抖处理打字指示器
+        // 实际应该发送WebSocket事件告诉对方我正在输入
+    }
+
+    checkContentSafety(content) {
+        // 简单的敏感词过滤（实际应该在后端进行更严格的检查）
+        const bannedWords = [
+            '手机号', '电话', '微信', 'QQ', '二维码', '加我',
+            '地址', '住址', '身份证', '银行卡', '密码'
+        ];
+        
+        for (const word of bannedWords) {
+            if (content.includes(word)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
 
-    // 设置事件监听器
-    setupEventListeners() {
-        // 反馈页面事件
-        document.querySelectorAll('.feedback-btn').forEach(btn => {
-            btn.onclick = (e) => {
-                const feeling = e.target.dataset.feeling;
-                this.submitFeedback(feeling);
-            };
-        });
-        
-        document.getElementById('submitFeedbackBtn').onclick = () => {
-            const text = document.getElementById('feedbackText').value;
-            this.submitFeedback('custom', text);
+    getGreetingByEmotion(emotion) {
+        const greetings = {
+            '开心': '看到你开心，我也感到愉快！今天有什么好事情分享吗？',
+            '烦躁': '烦躁的时候确实很难受，我在这里听着呢，想说说发生了什么吗？',
+            '低落': '低落的时候就像海上的阴天，但太阳总会再出来的。愿意和我说说吗？',
+            '快乐': '快乐是会传染的！我也被你感染了，有什么特别开心的事吗？',
+            '焦虑': '焦虑就像海浪一样来来去去，我懂这种感觉。想聊聊是什么让你焦虑吗？',
+            '纠结': '纠结的时候确实很难做决定，有时候说出来会清晰一些。',
+            '受伤': '受伤的感觉一定很痛，我在这里陪着你。',
+            '不安': '不安的时候就像站在摇晃的船上，抓住栏杆慢慢会稳住的。',
+            '懵了': '懵了的时候确实需要时间理清，不急，我们慢慢来。'
         };
         
-        document.getElementById('skipFeedbackBtn').onclick = () => {
-            this.switchScreen('welcome');
-        };
+        return greetings[emotion] || '你好，很高兴能和你倾诉。';
     }
 
-    // 提交反馈
-    async submitFeedback(feeling, text = '') {
-        try {
-            // 这里可以添加反馈提交逻辑
-            console.log('提交反馈:', { feeling, text });
-            
-            alert('感谢你的反馈！');
-            this.switchScreen('welcome');
-        } catch (error) {
-            console.error('提交反馈错误:', error);
-            this.switchScreen('welcome');
-        }
+    generateReply(myContent, emotion) {
+        // 简单的回复生成（实际应该更智能）
+        const replies = {
+            '开心': [
+                '真为你高兴！',
+                '这种开心的感觉真棒！',
+                '谢谢你的分享，让我也感受到了快乐。'
+            ],
+            '烦躁': [
+                '我理解这种烦躁的感觉。',
+                '深呼吸，慢慢来。',
+                '有时候说出来会好受一些。'
+            ],
+            '低落': [
+                '低落的时候确实不容易。',
+                '我在这里陪着你。',
+                '谢谢你愿意分享这些。'
+            ]
+        };
+        
+        const emotionReplies = replies[emotion] || [
+            '我明白了。',
+            '谢谢你的分享。',
+            '继续说吧，我在听。'
+        ];
+        
+        return emotionReplies[Math.floor(Math.random() * emotionReplies.length)];
+    }
+
+    showToast(message, type = 'info') {
+        // 简单的toast提示
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'error' ? '#f44336' : type === 'warning' ? '#FF9800' : type === 'success' ? '#4CAF50' : '#2196F3'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // 3秒后移除
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    document.body.removeChild(toast);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // ===== 10. Supabase 初始化 =====
+    initSupabase() {
+        // 这里需要你的Supabase配置
+        // this.supabase = createClient(supabaseUrl, supabaseKey);
+        
+        // 暂时注释，等待你的配置
+        console.log('Supabase初始化（需要配置URL和Key）');
+    }
+
+    async sendMessageToServer(message) {
+        // 实际的消息发送逻辑
+        // const { data, error } = await this.supabase
+        //     .from('messages')
+        //     .insert({
+        //         session_id: this.state.sessionId,
+        //         sender_id: this.state.userId,
+        //         content: message.content,
+        //         created_at: new Date().toISOString()
+        //     });
+        
+        // if (error) {
+        //     console.error('消息发送失败:', error);
+        //     this.showToast('消息发送失败', 'error');
+        //     return false;
+        // }
+        
+        return true;
     }
 }
 
-// 页面加载完成后启动应用
-document.addEventListener('DOMContentLoaded', () => {
-    window.app = new SpringBlossomApp();
-});
+// ===== 11. CSS动画补充 =====
+function addPetalsAnimationStyles() {
+    if (!document.querySelector('#petal-animation-styles')) {
+        const style = document.createElement('style');
+        style.id = 'petal-animation-styles';
+        style.textContent = `
+            @keyframes petalFall {
+                0% {
+                    transform: translateY(0) translateX(0) rotate(0deg);
+                    opacity: 0.9;
+                }
+                100% {
+                    transform: translateY(calc(100vh + 30px)) translateX(var(--drift, 0)) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            .toast {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                font-size: 0.95rem;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
 
-// 导出应用实例
-export { SpringBlossomApp };
+// ===== 12. 应用启动 =====
+document.addEventListener('DOMContentLoaded', () => {
+    // 添加花瓣动画样式
+    addPetalsAnimationStyles();
+    
+    // 创建应用实例
+    window.app = new SpringBlossomApp();
+    
+    // 添加键盘快捷键
+    document.addEventListener('keydown', (e) => {
+        // ESC键返回情绪选择
+        if (e.key === 'Escape' && window.app.state.currentScene !== 'emotion') {
+            if (window.app.state.currentScene === 'chat') {
+                if (confirm('确定要结束对话并返回吗？')) {
+                    window.app.endChat('manual');
+                }
+            } else {
+                window.app.switchScene('emotion');
+            }
+        }
+    });
+    
+    console.log('春暖花开应用已启动，祝您倾诉愉快 🌸');
+});
