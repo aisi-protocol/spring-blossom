@@ -1,18 +1,6 @@
 {
   "name": "spring-blossom",
-  "private": true,
   "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "vite": "^5.0.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+  "description": "春暖花开 - 静态部署版",
+  "scripts": {}
 }
